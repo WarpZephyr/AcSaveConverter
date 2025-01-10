@@ -1,0 +1,415 @@
+﻿using AcSaveConverterImGui.Graphics;
+using AcSaveConverterImGui.GUI.Dialogs.Popups.ACFA;
+using AcSaveConverterImGui.GUI.Dialogs.Tabs;
+using AcSaveConverterImGui.IO;
+using AcSaveConverterImGui.IO.Assets;
+using AcSaveFormats.ACFA;
+using AcSaveFormats.ACFA.Designs;
+using ImGuiNET;
+
+namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
+{
+    internal class DesignFaDialog : IDataTab
+    {
+        private readonly ImGuiGraphicsContext Graphics;
+        private static ImGuiTexture? DefaultThumbnailCache;
+        private bool IsDefaultThumbnail;
+
+        public string Name { get; set; }
+
+        private bool disposedValue;
+        public bool IsDisposed
+            => disposedValue;
+
+        public Design Design { get; private set; }
+        private ImGuiTexture ThumbnailCache;
+        private bool UTF16;
+        private bool Xbox;
+
+        private readonly AcColorSetPopup ColorsPopup;
+
+        public DesignFaDialog(string name, ImGuiGraphicsContext graphics, Design data)
+        {
+            Graphics = graphics;
+            Name = name;
+
+            Validate_Design(data);
+            Design = data;
+
+            if (DefaultThumbnailCache == null)
+            {
+                var defaultThumbnailPath = ImagesPath.GetImagePath(Path.Combine("ACFA", "thumb4026.bin"));
+                var defaultThumbnail = Thumbnail.Read(defaultThumbnailPath, false);
+                Design.Thumbnail = defaultThumbnail;
+                DefaultThumbnailCache = graphics.TexturePool.LoadDDS(defaultThumbnail.GetDDSBytes());
+            }
+
+            ThumbnailCache = DefaultThumbnailCache;
+            IsDefaultThumbnail = true;
+
+            UTF16 = true;
+            Xbox = false;
+
+            ColorsPopup = new AcColorSetPopup("AC Colors", Design.Colors);
+        }
+
+        #region Render
+
+        public void Render()
+        {
+            ImGui.PushID(nameof(DesignFaDialog));
+            Render_MenuBar();
+            if (ThumbnailCache != null)
+            {
+                ThumbnailCache.Image(ThumbnailCache.Size);
+                ImGui.SameLine();
+            }
+
+            ImGui.BeginGroup();
+            Render_Design(Design, ColorsPopup);
+            ImGui.EndGroup();
+
+            ColorsPopup.Render();
+            ImGui.PopID();
+        }
+
+        void Render_MenuBar()
+        {
+            if (ImGui.BeginMenuBar())
+            {
+                Render_FileMenu();
+                Render_OptionsMenu();
+                ImGui.EndMenuBar();
+            }
+        }
+
+        void Render_FileMenu()
+        {
+            if (ImGui.BeginMenu("File"))
+            {
+                if (ImGui.MenuItem("Open"))
+                {
+                    string? file = FileDialog.OpenFile();
+                    if (FileDialog.ValidFile(file))
+                    {
+                        Load_Data(file);
+                    }
+                }
+
+                ImGui.EndMenu();
+            }
+        }
+
+        void Render_OptionsMenu()
+        {
+            if (ImGui.BeginMenu("Options"))
+            {
+                ImGui.MenuItem("UTF16", "", ref UTF16);
+                ImGui.MenuItem("Xbox", "", ref Xbox);
+                ImGui.EndMenu();
+            }
+        }
+
+        internal static void Render_Design(Design design, AcColorSetPopup colorPopup)
+        {
+            ImGui.SeparatorText(design.DesignName);
+            if (ImGui.BeginTable("DesignTable", 2, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.BordersInnerV))
+            {
+                ImGui.TableNextColumn();
+                ImGui.Text("Design");
+                ImGui.TableNextColumn();
+                ImGui.Text(design.DesignName);
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                ImGui.Text("Designer");
+                ImGui.TableNextColumn();
+                ImGui.Text(design.DesignerName);
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                ImGui.Text("Creation Time");
+                ImGui.TableNextColumn();
+                ImGui.Text(design.CreationTimeStamp.ToString());
+                ImGui.EndTable();
+            }
+
+            if (ImGui.Button("AC Colors"))
+            {
+                colorPopup.Load_Data(design.Colors);
+                colorPopup.OpenPopup = true;
+            }
+        }
+
+        #endregion
+
+        #region Data
+
+        public void Load_Data(Design data)
+        {
+            Validate_Design(data);
+            Design = data;
+            InvalidateThumbnailCache();
+            ThumbnailCache = Graphics.TexturePool.LoadDDS(Design.Thumbnail.GetDDSBytes());
+            IsDefaultThumbnail = false;
+            ColorsPopup.Load_Data(Design.Colors);
+        }
+
+        public void Load_Data(string path)
+        {
+            Load_Data(Design.Read(path, UTF16, Xbox));
+        }
+
+        public bool IsData(string file)
+        {
+            return file.EndsWith("ACDES.DAT", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public void Save_Data(string path)
+        {
+            Design.Write(path);
+        }
+
+        #endregion
+
+        #region Validation
+
+        private static void Validate_Tuning(Design.DesignTuning tuning)
+        {
+            tuning.Unk1C = 0;
+            tuning.Unk1D = 0;
+            tuning.Unk1E = 0;
+            tuning.Unk1F = 0;
+
+            byte[] tunes =
+            [
+                tuning.EnOutput,
+                tuning.EnCapacity,
+                tuning.KpOutput,
+                tuning.Load,
+                tuning.EnWeaponSkill,
+                tuning.Maneuverability,
+                tuning.FiringStability,
+                tuning.AimPrecision,
+                tuning.LockSpeed,
+                tuning.MissileLockSpeed,
+                tuning.RadarRefreshRate,
+                tuning.EcmResistance,
+                tuning.RectificationHead,
+                tuning.RectificationCore,
+                tuning.RectificationArm,
+                tuning.RectificationLeg,
+                tuning.HorizontalThrustMain,
+                tuning.VerticalThrust,
+                tuning.HorizontalThrustSide,
+                tuning.HorizontalThrustBack,
+                tuning.QuickBoostMain,
+                tuning.QuickBoostSide,
+                tuning.QuickBoostBack,
+                tuning.OveredBoostThrust,
+                tuning.TurningAbility,
+                tuning.StabilityHead,
+                tuning.StabilityCore,
+                tuning.StabilityLegs,
+                tuning.Unk1C,
+                tuning.Unk1D,
+                tuning.Unk1E,
+                tuning.Unk1F
+            ];
+
+            const byte minTune = 0;
+            const byte maxTune = 50;
+            const int maxFrs = 442;
+            var totalFrsConsumed = 0;
+            for (int i = 0; i < tunes.Length; i++)
+            {
+                tunes[i] = Math.Clamp(tunes[i], minTune, maxTune);
+                totalFrsConsumed += tunes[i];
+            }
+
+            int remaining = totalFrsConsumed - maxFrs;
+            if (remaining > 0)
+            {
+                for (int i = tunes.Length - 1; i >= 0; i--)
+                {
+                    if (tunes[i] == maxTune)
+                    {
+                        if (remaining >= maxTune)
+                        {
+                            remaining -= maxTune;
+                            tunes[i] = minTune;
+                        }
+                        else
+                        {
+                            tunes[i] -= (byte)remaining;
+                            remaining = 0;
+                        }
+                    }
+                    else if (tunes[i] > minTune && tunes[i] < maxTune)
+                    {
+                        if (remaining >= tunes[i])
+                        {
+                            remaining -= tunes[i];
+                            tunes[i] = minTune;
+                        }
+                        else
+                        {
+                            tunes[i] -= (byte)remaining;
+                            remaining = 0;
+                        }
+                    }
+                }
+            }
+
+            int tuneIndex = 0;
+            tuning.EnOutput = tunes[tuneIndex++];
+            tuning.EnCapacity = tunes[tuneIndex++];
+            tuning.KpOutput = tunes[tuneIndex++];
+            tuning.Load = tunes[tuneIndex++];
+            tuning.EnWeaponSkill = tunes[tuneIndex++];
+            tuning.Maneuverability = tunes[tuneIndex++];
+            tuning.FiringStability = tunes[tuneIndex++];
+            tuning.AimPrecision = tunes[tuneIndex++];
+            tuning.LockSpeed = tunes[tuneIndex++];
+            tuning.MissileLockSpeed = tunes[tuneIndex++];
+            tuning.RadarRefreshRate = tunes[tuneIndex++];
+            tuning.EcmResistance = tunes[tuneIndex++];
+            tuning.RectificationHead = tunes[tuneIndex++];
+            tuning.RectificationCore = tunes[tuneIndex++];
+            tuning.RectificationArm = tunes[tuneIndex++];
+            tuning.RectificationLeg = tunes[tuneIndex++];
+            tuning.HorizontalThrustMain = tunes[tuneIndex++];
+            tuning.VerticalThrust = tunes[tuneIndex++];
+            tuning.HorizontalThrustSide = tunes[tuneIndex++];
+            tuning.HorizontalThrustBack = tunes[tuneIndex++];
+            tuning.QuickBoostMain = tunes[tuneIndex++];
+            tuning.QuickBoostSide = tunes[tuneIndex++];
+            tuning.QuickBoostBack = tunes[tuneIndex++];
+            tuning.OveredBoostThrust = tunes[tuneIndex++];
+            tuning.TurningAbility = tunes[tuneIndex++];
+            tuning.StabilityHead = tunes[tuneIndex++];
+            tuning.StabilityCore = tunes[tuneIndex++];
+            tuning.StabilityLegs = tunes[tuneIndex++];
+            tuning.Unk1C = tunes[tuneIndex++];
+            tuning.Unk1D = tunes[tuneIndex++];
+            tuning.Unk1E = tunes[tuneIndex++];
+            tuning.Unk1F = tunes[tuneIndex];
+        }
+
+        private static void Validate_Parts(Design.DesignParts parts)
+        {
+            static ushort ValidatePart(ushort part, ushort defaultValue)
+            {
+                const ushort debugPartRange = 9000;
+                if (part >= debugPartRange)
+                {
+                    return defaultValue;
+                }
+
+                return part;
+            }
+
+            parts.Head = ValidatePart(parts.Head, 2010);
+            parts.Core = ValidatePart(parts.Core, 2010);
+            parts.Arms = ValidatePart(parts.Arms, 2010);
+            parts.Legs = ValidatePart(parts.Legs, 2010);
+            parts.Fcs = ValidatePart(parts.Fcs, 2010);
+            parts.Generator = ValidatePart(parts.Generator, 2010);
+            parts.MainBooster = ValidatePart(parts.MainBooster, 2020);
+            parts.BackBooster = ValidatePart(parts.BackBooster, 2010);
+            parts.SideBooster = ValidatePart(parts.SideBooster, 2020);
+            parts.OveredBooster = ValidatePart(parts.OveredBooster, 2010);
+            parts.RightArmUnit = ValidatePart(parts.RightArmUnit, 2020);
+            parts.LeftArmUnit = ValidatePart(parts.LeftArmUnit, 2040);
+            parts.RightBackUnit = ValidatePart(parts.RightBackUnit, 0);
+            parts.LeftBackUnit = ValidatePart(parts.LeftBackUnit, 2020);
+            parts.ShoulderUnit = ValidatePart(parts.ShoulderUnit, 0);
+            parts.RightHangarUnit = ValidatePart(parts.RightHangarUnit, 0);
+            parts.LeftHangarUnit = ValidatePart(parts.LeftHangarUnit, 0);
+            parts.StabilizerHeadTop = ValidatePart(parts.StabilizerHeadTop, 0);
+            parts.StabilizerHeadRight = ValidatePart(parts.StabilizerHeadRight, 0);
+            parts.StabilizerHeadLeft = ValidatePart(parts.StabilizerHeadLeft, 0);
+            parts.StabilizerCoreUpperRight = ValidatePart(parts.StabilizerCoreUpperRight, 0);
+            parts.StabilizerCoreUpperLeft = ValidatePart(parts.StabilizerCoreUpperLeft, 0);
+            parts.StabilizerCoreLowerRight = ValidatePart(parts.StabilizerCoreLowerRight, 0);
+            parts.StabilizerCoreLowerLeft = ValidatePart(parts.StabilizerCoreLowerLeft, 0);
+            parts.StabilizerArmRight = ValidatePart(parts.StabilizerArmRight, 0);
+            parts.StabilizerArmLeft = ValidatePart(parts.StabilizerArmLeft, 0);
+            parts.StabilizerLegsBack = ValidatePart(parts.StabilizerLegsBack, 0);
+            parts.StabilizerLegsUpperRight = ValidatePart(parts.StabilizerLegsUpperRight, 0);
+            parts.StabilizerLegsUpperLeft = ValidatePart(parts.StabilizerLegsUpperLeft, 0);
+            parts.StabilizerLegsUpperRightBack = ValidatePart(parts.StabilizerLegsUpperRightBack, 0);
+            parts.StabilizerLegsUpperLeftBack = ValidatePart(parts.StabilizerLegsUpperLeftBack, 0);
+            parts.StabilizerLegsMiddleRight = ValidatePart(parts.StabilizerLegsMiddleRight, 0);
+            parts.StabilizerLegsMiddleLeft = ValidatePart(parts.StabilizerLegsMiddleLeft, 0);
+            parts.StabilizerLegsMiddleRightBack = ValidatePart(parts.StabilizerLegsMiddleRightBack, 0);
+            parts.StabilizerLegsMiddleLeftBack = ValidatePart(parts.StabilizerLegsMiddleLeftBack, 0);
+            parts.StabilizerLegsLowerRight = ValidatePart(parts.StabilizerLegsLowerRight, 0);
+            parts.StabilizerLegsLowerLeft = ValidatePart(parts.StabilizerLegsLowerLeft, 0);
+            parts.StabilizerLegsLowerRightBack = ValidatePart(parts.StabilizerLegsLowerRightBack, 0);
+            parts.StabilizerLegsLowerLeftBack = ValidatePart(parts.StabilizerLegsLowerLeftBack, 0);
+        }
+
+        internal static void Validate_Design(Design design)
+        {
+            var tuning = design.Tuning;
+            Validate_Tuning(tuning);
+            Validate_Parts(design.Parts);
+        }
+
+        #endregion
+
+        #region Util
+
+        private static string GetSecondsTimeString(float seconds)
+        {
+            float hour = seconds / 3600;
+            float minute = seconds / 60 % 60;
+            float second = seconds % 60;
+            return $"{hour:00}:{minute:00}:{second:00}";
+        }
+
+        #endregion
+
+        #region Thumbnail
+
+        void InvalidateThumbnailCache()
+        {
+            if (!IsDefaultThumbnail)
+            {
+                ThumbnailCache.Dispose();
+            }
+        }
+
+        public static void InvalidateDefaultThumbnailCache()
+        {
+            DefaultThumbnailCache?.Dispose();
+        }
+
+        #endregion
+
+        #region IDisposable
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    InvalidateThumbnailCache();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
+    }
+}
