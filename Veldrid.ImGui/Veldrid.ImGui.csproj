@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile Condition="'$(Configuration)' == 'Release'">$(BinDir)/$(AssemblyName).xml</DocumentationFile>
     <RootNamespace>Veldrid</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
