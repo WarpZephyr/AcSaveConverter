@@ -19,3 +19,4 @@ git clone https://github.com/WarpZephyr/BinaryMemory.git
 
 # Credits
 Massive thanks to [DrSwizzler](https://github.com/Shadowth117/DrSwizzler) for support loading Xbox 360 texture files.
+Massive thanks to [Smithbox](https://github.com/vawser/Smithbox) for font handling to display japanese characters.
