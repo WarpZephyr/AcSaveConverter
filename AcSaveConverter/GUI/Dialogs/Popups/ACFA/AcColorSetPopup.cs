@@ -1,8 +1,7 @@
 ﻿using AcSaveFormats.ACFA.Colors;
 using ImGuiNET;
-using Newtonsoft.Json.Linq;
+using System;
 using System.Drawing;
-using System.Runtime.CompilerServices;
 
 namespace AcSaveConverterImGui.GUI.Dialogs.Popups.ACFA
 {

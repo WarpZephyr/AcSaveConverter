@@ -1,5 +1,6 @@
 ﻿using NativeFileDialogSharp;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace AcSaveConverterImGui.IO
 {
@@ -52,6 +53,11 @@ namespace AcSaveConverterImGui.IO
         public static bool ValidFile([NotNullWhen(true)] string? file)
         {
             return !string.IsNullOrWhiteSpace(file) && File.Exists(file);
+        }
+
+        public static bool ValidSavePath([NotNullWhen(true)] string? file)
+        {
+            return !string.IsNullOrWhiteSpace(file);
         }
 
         public static bool ValidFolder([NotNullWhen(true)] string? folder)

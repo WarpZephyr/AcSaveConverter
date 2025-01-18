@@ -1,9 +1,11 @@
 ﻿using Pfim;
-using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 
-namespace AcSaveConverterImGui.Graphics
+namespace AcSaveConverter.Graphics.Textures
 {
     internal static class TextureConverter
     {
@@ -42,19 +44,19 @@ namespace AcSaveConverterImGui.Graphics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image LoadImageSharp(byte[] bytes)
-            => Image.Load(bytes);
+        public static Image<Rgba32> LoadImageSharp(byte[] bytes)
+            => Image.Load<Rgba32>(bytes);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image LoadImageSharp(Stream stream)
-            => Image.Load(stream);
+        public static Image<Rgba32> LoadImageSharp(Stream stream)
+            => Image.Load<Rgba32>(stream);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image LoadImageSharp(string path)
-            => Image.Load(path);
+        public static Image<Rgba32> LoadImageSharp(string path)
+            => Image.Load<Rgba32>(path);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image<Bgra32> LoadPfimImageSharp(byte[] bytes)
+        public static Image<Bgra32> LoadPfimImageSharp(ReadOnlySpan<byte> bytes)
             => ToImageSharp(LoadPfim(bytes));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

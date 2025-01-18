@@ -8,6 +8,9 @@ using AcSaveFormats.ACFA;
 using AcSaveFormats.ACFA.PS3;
 using AcSaveFormats.ACFA.Xbox360;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace AcSaveConverterImGui.GUI.Dialogs.Tabs
 {

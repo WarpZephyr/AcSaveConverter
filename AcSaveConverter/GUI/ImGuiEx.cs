@@ -1,10 +1,10 @@
 ﻿using AcSaveConverterImGui.Drawing;
-using AcSaveFormats.ACFA;
 using ImGuiNET;
+using System;
 using System.Drawing;
 using System.Numerics;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+
 namespace AcSaveConverterImGui.GUI
 {
     internal static class ImGuiEx

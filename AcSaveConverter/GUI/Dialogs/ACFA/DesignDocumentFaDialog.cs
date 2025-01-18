@@ -1,10 +1,13 @@
-﻿using AcSaveConverterImGui.Graphics;
+﻿using AcSaveConverter.Graphics.Textures;
+using AcSaveConverterImGui.Graphics;
 using AcSaveConverterImGui.GUI.Dialogs.Popups.ACFA;
 using AcSaveConverterImGui.GUI.Dialogs.Tabs;
 using AcSaveConverterImGui.IO;
 using AcSaveFormats.ACFA;
 using AcSaveFormats.ACFA.Designs;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
 namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
 {
     internal class DesignDocumentFaDialog : IDataTab
@@ -101,6 +104,13 @@ namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
 
                     ImGui.TableNextColumn();
                     thumbnail.Image(thumbnail.Size);
+                    if (ImGui.BeginPopupContextItem("ThumbnailContextMenu"))
+                    {
+                        Render_ThumbnailContextMenu(design, i);
+
+                        ImGui.EndPopup();
+                    }
+
                     ImGui.AlignTextToFramePadding();
 
                     ImGui.TableNextColumn();
@@ -110,6 +120,54 @@ namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
                 }
 
                 ImGui.EndTable();
+            }
+        }
+
+        void Render_ThumbnailContextMenu(Design design, int index)
+        {
+            if (ImGui.Button("Export"))
+            {
+                const StringComparison comp = StringComparison.InvariantCultureIgnoreCase;
+                string? path = FileDialog.GetSaveFilePath("png;jpg;bmp;dds");
+                if (FileDialog.ValidSavePath(path))
+                {
+                    if (path.EndsWith(".png", comp))
+                    {
+                        TextureSave.ExportPng(path, design.Thumbnail.GetDDSBytes());
+                    }
+                    else if (path.EndsWith(".jpg", comp) || path.EndsWith(".jpeg", comp))
+                    {
+                        TextureSave.ExportJpeg(path, design.Thumbnail.GetDDSBytes());
+                    }
+                    else if (path.EndsWith(".bmp", comp))
+                    {
+                        TextureSave.ExportBmp(path, design.Thumbnail.GetDDSBytes());
+                    }
+                    else if (path.EndsWith(".dds", comp))
+                    {
+                        TextureSave.ExportDDS(path, design.Thumbnail.GetDDSBytes());
+                    }
+                }
+            }
+
+            if (ImGui.Button("Import"))
+            {
+                try
+                {
+                    string? path = FileDialog.OpenFile("dds;bin");
+                    if (FileDialog.ValidFile(path))
+                    {
+                        if (DesignFaDialog.ImportThumbnail(path, Xbox, design.Thumbnail, out Thumbnail? output))
+                        {
+                            design.Thumbnail = output;
+                            ReloadThumbnailCache(index);
+                        }
+                    }
+                }
+                catch
+                {
+
+                }
             }
         }
 
@@ -157,6 +215,12 @@ namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
             {
                 LoadThumbnail(design.Thumbnail);
             }
+        }
+
+        void ReloadThumbnailCache(int index)
+        {
+            ThumbnailCache[index].Dispose();
+            ThumbnailCache[index] = Graphics.TexturePool.LoadDDS(DesignDocument.Designs[index].Thumbnail.GetDDSBytes());
         }
 
         void LoadThumbnail(Thumbnail thumbnail)

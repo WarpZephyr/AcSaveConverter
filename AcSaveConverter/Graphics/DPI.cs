@@ -1,4 +1,6 @@
-﻿namespace AcSaveConverterImGui.Graphics
+﻿using System;
+
+namespace AcSaveConverterImGui.Graphics
 {
     public class DPI
     {

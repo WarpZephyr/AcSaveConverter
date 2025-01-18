@@ -1,4 +1,7 @@
-﻿namespace AcSaveConverterImGui
+﻿using System;
+using System.Collections.Generic;
+
+namespace AcSaveConverterImGui
 {
     internal static class EnumCache<TEnum> where TEnum : struct, Enum
     {

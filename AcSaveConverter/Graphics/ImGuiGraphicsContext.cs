@@ -1,11 +1,13 @@
-﻿using ImGuiNET;
-using Veldrid.StartupUtilities;
+﻿using AcSaveConverterImGui.Graphics.Fonts;
+using AcSaveConverterImGui.IO.Assets;
+using ImGuiNET;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
 using Veldrid;
 using Veldrid.Sdl2;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using AcSaveConverterImGui.Graphics.Fonts;
-using AcSaveConverterImGui.IO.Assets;
+using Veldrid.StartupUtilities;
 
 namespace AcSaveConverterImGui.Graphics
 {
@@ -32,7 +34,7 @@ namespace AcSaveConverterImGui.Graphics
             int bheight = (int)framebuffer.Height;
             ImGuiRenderer = new ImGuiRenderer(GraphicsDevice, outDesc, bwidth, bheight);
             CommandList = GraphicsDevice.ResourceFactory.CreateCommandList();
-            TexturePool = new ImGuiTexturePool(GraphicsDevice, ImGuiRenderer);
+            TexturePool = new ImGuiTexturePool(GraphicsDevice, GraphicsDevice.ResourceFactory, CommandList, ImGuiRenderer);
             Window = new Window(sdl2Window);
             UI = new UI();
             DPI = new DPI(UI);
@@ -177,7 +179,17 @@ namespace AcSaveConverterImGui.Graphics
                 CommandList.Begin();
                 CommandList.SetFramebuffer(GraphicsDevice.MainSwapchain.Framebuffer);
                 CommandList.ClearColorTarget(0, Window.BgColorInternal);
-                ImGuiRenderer.Render(GraphicsDevice, CommandList);
+
+                // This feels hacky
+                if (!TexturePool.CommandListDirty)
+                {
+                    ImGuiRenderer.Render(GraphicsDevice, CommandList);
+                }
+                else
+                {
+                    TexturePool.CommandListDirty = false;
+                }
+
                 CommandList.End();
                 GraphicsDevice.SubmitCommands(CommandList);
                 GraphicsDevice.SwapBuffers(GraphicsDevice.MainSwapchain);

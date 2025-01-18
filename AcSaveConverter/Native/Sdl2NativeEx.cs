@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using Veldrid.Sdl2;
-using NativeLibraryLoader;
-using System.Diagnostics;
 using NativeLibrary = NativeLibraryLoader.NativeLibrary;
 
 namespace AcSaveConverterImGui.Native

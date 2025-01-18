@@ -3,6 +3,8 @@ using AcSaveConverterImGui.GUI.Dialogs.ACFA;
 using AcSaveConverterImGui.GUI.Dialogs.Popups;
 using AcSaveConverterImGui.GUI.Dialogs.Tabs;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace AcSaveConverterImGui.GUI.Windows

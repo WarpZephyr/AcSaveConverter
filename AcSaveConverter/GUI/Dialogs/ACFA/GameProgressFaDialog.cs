@@ -3,6 +3,7 @@ using AcSaveConverterImGui.GUI.Dialogs.Tabs;
 using AcSaveConverterImGui.IO;
 using AcSaveFormats.ACFA;
 using ImGuiNET;
+using System;
 
 namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
 {

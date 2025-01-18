@@ -4,6 +4,7 @@ using AcSaveConverterImGui.IO;
 using AcSaveFormats.ACFA;
 using AcSaveFormats.ACFA.Colors;
 using ImGuiNET;
+using System;
 using System.Drawing;
 using System.Numerics;
 

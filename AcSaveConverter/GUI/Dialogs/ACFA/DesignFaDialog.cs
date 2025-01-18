@@ -1,4 +1,5 @@
-﻿using AcSaveConverterImGui.Graphics;
+﻿using AcSaveConverter.Graphics.Textures;
+using AcSaveConverterImGui.Graphics;
 using AcSaveConverterImGui.GUI.Dialogs.Popups.ACFA;
 using AcSaveConverterImGui.GUI.Dialogs.Tabs;
 using AcSaveConverterImGui.IO;
@@ -6,6 +7,9 @@ using AcSaveConverterImGui.IO.Assets;
 using AcSaveFormats.ACFA;
 using AcSaveFormats.ACFA.Designs;
 using ImGuiNET;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
 {
@@ -59,11 +63,16 @@ namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
         {
             ImGui.PushID(nameof(DesignFaDialog));
             Render_MenuBar();
-            if (ThumbnailCache != null)
+
+            ThumbnailCache.Image(ThumbnailCache.Size);
+            if (ImGui.BeginPopupContextItem("ThumbnailContextMenu"))
             {
-                ThumbnailCache.Image(ThumbnailCache.Size);
-                ImGui.SameLine();
+                Render_ThumbnailContextMenu();
+
+                ImGui.EndPopup();
             }
+
+            ImGui.SameLine();
 
             ImGui.BeginGroup();
             Render_Design(Design, ColorsPopup);
@@ -141,6 +150,54 @@ namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
             }
         }
 
+        void Render_ThumbnailContextMenu()
+        {
+            if (ImGui.Button("Export"))
+            {
+                const StringComparison comp = StringComparison.InvariantCultureIgnoreCase;
+                string? path = FileDialog.GetSaveFilePath("png;jpg;bmp;dds");
+                if (FileDialog.ValidSavePath(path))
+                {
+                    if (path.EndsWith(".png", comp))
+                    {
+                        TextureSave.ExportPng(path, Design.Thumbnail.GetDDSBytes());
+                    }
+                    else if (path.EndsWith(".jpg", comp) || path.EndsWith(".jpeg", comp))
+                    {
+                        TextureSave.ExportJpeg(path, Design.Thumbnail.GetDDSBytes());
+                    }
+                    else if (path.EndsWith(".bmp", comp))
+                    {
+                        TextureSave.ExportBmp(path, Design.Thumbnail.GetDDSBytes());
+                    }
+                    else if (path.EndsWith(".dds", comp))
+                    {
+                        TextureSave.ExportDDS(path, Design.Thumbnail.GetDDSBytes());
+                    }
+                }
+            }
+
+            if (ImGui.Button("Import"))
+            {
+                try
+                {
+                    string? path = FileDialog.OpenFile("dds;bin");
+                    if (FileDialog.ValidFile(path))
+                    {
+                        if (ImportThumbnail(path, Xbox, Design.Thumbnail, out Thumbnail? output))
+                        {
+                            Design.Thumbnail = output;
+                            RebuildThumbnailCache();
+                        }
+                    }
+                }
+                catch
+                {
+                    
+                }
+            }
+        }
+
         #endregion
 
         #region Data
@@ -149,9 +206,7 @@ namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
         {
             Validate_Design(data);
             Design = data;
-            InvalidateThumbnailCache();
-            ThumbnailCache = Graphics.TexturePool.LoadDDS(Design.Thumbnail.GetDDSBytes());
-            IsDefaultThumbnail = false;
+            RebuildThumbnailCache();
             ColorsPopup.Load_Data(Design.Colors);
         }
 
@@ -373,6 +428,13 @@ namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
 
         #region Thumbnail
 
+        void RebuildThumbnailCache()
+        {
+            InvalidateThumbnailCache();
+            ThumbnailCache = Graphics.TexturePool.LoadDDS(Design.Thumbnail.GetDDSBytes());
+            IsDefaultThumbnail = false;
+        }
+
         void InvalidateThumbnailCache()
         {
             if (!IsDefaultThumbnail)
@@ -384,6 +446,53 @@ namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
         public static void InvalidateDefaultThumbnailCache()
         {
             DefaultThumbnailCache?.Dispose();
+        }
+
+        public static bool ImportThumbnail(string path, bool xbox, Thumbnail previous, [NotNullWhen(true)] out Thumbnail? output)
+        {
+            if (path.EndsWith(".dds", StringComparison.InvariantCultureIgnoreCase))
+            {
+                byte[] bytes = File.ReadAllBytes(path);
+                DDS dds = DDS.Read(bytes);
+                int dataOffset = dds.DataOffset;
+                if (dds.Width != 256
+                 || dds.Height != 128
+                 || dds.HeaderDXT10 != null
+                 || dds.Flags != (DDS.DDSD.CAPS | DDS.DDSD.HEIGHT | DDS.DDSD.WIDTH | DDS.DDSD.PIXELFORMAT | DDS.DDSD.MIPMAPCOUNT | DDS.DDSD.LINEARSIZE)
+                 || dds.Caps != DDS.DDSCAPS.TEXTURE
+                 || dds.MipMapCount != 1
+                 || dds.DDSPixelFormat.FourCC != "DXT1"
+                 || (bytes.Length - dataOffset) != 16384
+                 || !previous.SetPixelData(bytes[dataOffset..]))
+                {
+                    // Currently cannot convert to the desired format
+                    output = null;
+                    return false;
+                }
+
+                output = previous;
+            }
+            else if (path.EndsWith(".bin"))
+            {
+                try
+                {
+                    output = Thumbnail.Read(path, xbox);
+                }
+                catch
+                {
+                    // Was not a thumbnail file
+                    output = null;
+                    return false;
+                }
+            }
+            else
+            {
+                // Was not a loadable file
+                output = null;
+                return false;
+            }
+
+            return true;
         }
 
         #endregion

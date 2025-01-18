@@ -1,5 +1,9 @@
-﻿using SixLabors.ImageSharp;
+﻿using AcSaveConverter.Graphics.Textures;
+using AcSaveFormats.Textures;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using System.IO;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Veldrid;
@@ -10,32 +14,34 @@ namespace AcSaveConverterImGui.Graphics
     public class ImGuiTexturePool
     {
         private readonly GraphicsDevice Graphics;
+        private readonly ResourceFactory Factory;
         private readonly ImGuiRenderer ImGuiRenderer;
+        private readonly DdsLoader DdsLoader;
+        public bool CommandListDirty { get; set; }
 
-        internal ImGuiTexturePool(GraphicsDevice graphics, ImGuiRenderer imGuiRenderer)
+        internal ImGuiTexturePool(GraphicsDevice graphics, ResourceFactory factory, CommandList commandList, ImGuiRenderer imGuiRenderer)
         {
             Graphics = graphics;
+            Factory = factory;
             ImGuiRenderer = imGuiRenderer;
+            DdsLoader = new DdsLoader(graphics, factory, commandList);
         }
 
         #region Load DDS
 
         public ImGuiTexture LoadDDS(byte[] bytes)
         {
-            var simage = TextureConverter.LoadPfimImageSharp(bytes);
-            return LoadImageSharpTexture(simage.CloneAs<Rgba32>());
-        }
-
-        public ImGuiTexture LoadDDS(Stream stream)
-        {
-            var simage = TextureConverter.LoadPfimImageSharp(stream);
-            return LoadImageSharpTexture(simage.CloneAs<Rgba32>());
+            var dds = DDS.Read(bytes);
+            var texture = DdsLoader.LoadDDS(dds, bytes, string.Empty);
+            return LoadVeldridTexture(texture);
         }
 
         public ImGuiTexture LoadDDS(string path)
         {
-            var simage = TextureConverter.LoadPfimImageSharp(path);
-            return LoadImageSharpTexture(simage.CloneAs<Rgba32>());
+            byte[] bytes = File.ReadAllBytes(path);
+            var dds = DDS.Read(bytes);
+            var texture = DdsLoader.LoadDDS(dds, bytes, string.Empty);
+            return LoadVeldridTexture(texture);
         }
 
         #endregion
@@ -45,19 +51,19 @@ namespace AcSaveConverterImGui.Graphics
         public ImGuiTexture LoadCommon(byte[] bytes)
         {
             var simage = TextureConverter.LoadImageSharp(bytes);
-            return LoadImageSharpTexture(simage.CloneAs<Rgba32>());
+            return LoadImageSharpTexture(simage);
         }
 
         public ImGuiTexture LoadCommon(Stream stream)
         {
             var simage = TextureConverter.LoadImageSharp(stream);
-            return LoadImageSharpTexture(simage.CloneAs<Rgba32>());
+            return LoadImageSharpTexture(simage);
         }
 
         public ImGuiTexture LoadCommon(string path)
         {
             var simage = TextureConverter.LoadImageSharp(path);
-            return LoadImageSharpTexture(simage.CloneAs<Rgba32>());
+            return LoadImageSharpTexture(simage);
         }
 
         #endregion
@@ -79,6 +85,7 @@ namespace AcSaveConverterImGui.Graphics
         public bool DestroyTexture(ImGuiTexture texture)
         {
             ImGuiRenderer.RemoveImGuiBinding(texture.Texture);
+            CommandListDirty = true;
             return true;
         }
 
@@ -89,20 +96,20 @@ namespace AcSaveConverterImGui.Graphics
         private ImGuiTexture CreateVeldridTexture(uint width, uint height, TextureUsage usage)
         {
             var desc = TextureDescription.Texture2D(width, height, 1, 1, PixelFormat.R8_G8_B8_A8_UNorm, usage);
-            var dimage = Graphics.ResourceFactory.CreateTexture(desc);
+            var dimage = Factory.CreateTexture(desc);
             return LoadVeldridTexture(dimage);
         }
 
         private ImGuiTexture LoadImageSharpTexture(Image<Rgba32> texture)
         {
-            var vsimage = new ImageSharpTexture(texture);
-            var dimage = vsimage.CreateDeviceTexture(Graphics, Graphics.ResourceFactory);
+            var vsimage = new ImageSharpTexture<Rgba32>(texture);
+            var dimage = vsimage.CreateDeviceTexture(Graphics, Factory);
             return LoadVeldridTexture(dimage);
         }
 
         private ImGuiTexture LoadVeldridTexture(Texture texture)
         {
-            nint handle = ImGuiRenderer.GetOrCreateImGuiBinding(Graphics.ResourceFactory, texture);
+            nint handle = ImGuiRenderer.GetOrCreateImGuiBinding(Factory, texture);
             return new ImGuiTexture(this, texture, handle);
         }
 

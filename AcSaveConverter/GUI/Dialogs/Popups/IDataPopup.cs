@@ -1,4 +1,6 @@
-﻿namespace AcSaveConverterImGui.GUI.Dialogs.Popups
+﻿using System;
+
+namespace AcSaveConverterImGui.GUI.Dialogs.Popups
 {
     public interface IDataPopup : IDialog, IClosable, INamed, IDisposable
     {
