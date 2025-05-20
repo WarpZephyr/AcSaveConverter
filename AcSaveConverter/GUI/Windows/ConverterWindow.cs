@@ -5,6 +5,7 @@ using AcSaveConverterImGui.GUI.Dialogs.Tabs;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace AcSaveConverterImGui.GUI.Windows
@@ -79,6 +80,7 @@ namespace AcSaveConverterImGui.GUI.Windows
             }
         }
 
+        [Conditional("DEBUG")]
         void Render_ImGuiMenu()
         {
             if (ImGui.BeginMenu("ImGui"))
@@ -107,6 +109,7 @@ namespace AcSaveConverterImGui.GUI.Windows
             }
         }
 
+        [Conditional("DEBUG")]
         void Render_ImGuiDebug()
         {
             if (ShowImGuiAbout)

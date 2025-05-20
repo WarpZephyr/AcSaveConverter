@@ -10,7 +10,7 @@ namespace AcSaveConverterImGui
 
         static void Main(string[] args)
         { 
-            var graphics = new ImGuiGraphicsContext(100, 100, 800, 500, "AcSaveConverter");
+            using var graphics = new ImGuiGraphicsContext(100, 100, 800, 500, "AcSaveConverter");
             var converter = new ConverterWindow(graphics, graphics.Window);
             graphics.Run();
         }

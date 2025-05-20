@@ -11,7 +11,7 @@ using Veldrid.StartupUtilities;
 
 namespace AcSaveConverterImGui.Graphics
 {
-    public class ImGuiGraphicsContext
+    public class ImGuiGraphicsContext : IDisposable
     {
         private readonly GraphicsDevice GraphicsDevice;
         private readonly CommandList CommandList;
@@ -20,6 +20,7 @@ namespace AcSaveConverterImGui.Graphics
         public readonly Window Window;
         public readonly UI UI;
         public readonly DPI DPI;
+        private bool disposedValue;
 
         public event Action? Render;
 
@@ -195,5 +196,31 @@ namespace AcSaveConverterImGui.Graphics
                 GraphicsDevice.SwapBuffers(GraphicsDevice.MainSwapchain);
             }
         }
+
+        #region IDisposable
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    ImGuiRenderer.Dispose();
+                    CommandList.Dispose();
+                    GraphicsDevice.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 }
