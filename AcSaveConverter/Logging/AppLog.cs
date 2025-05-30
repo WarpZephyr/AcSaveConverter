@@ -178,6 +178,7 @@ namespace AcSaveConverter.Logging
                     var endTime = DateTime.Now;
                     WriteLine($"[Run Time: {endTime - StartTime}]");
                     WriteLine($"[Log Ended: {endTime:MM-dd-yyyy-hh:mm:ss}]");
+                    WriteLine(); // Spacer between runs
 
                     Flush();
                     Log.Dispose();
