@@ -93,6 +93,8 @@ namespace AcSaveConverter.Logging
 #else
             WriteLine("[App Build: Release]");
 #endif
+            WriteLine($"[App Name: {AppInfo.AppName}]");
+            WriteLine($"[App File Path: \"{appInfo.AppFilePath}\"]");
             WriteLine($"[App Directory: \"{appInfo.AppDirectory}\"]");
         }
 

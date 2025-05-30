@@ -6,20 +6,22 @@ namespace AcSaveConverter
 {
     internal class AppInfo
     {
+        public readonly string Platform;
+        public readonly string Version;
 #if DEBUG
         public const bool IsDebug = true;
 #else
         public const bool IsDebug = false;
 #endif
-
-        public readonly string Platform;
-        public readonly string Version;
+        public const string AppName = Program.AppName;
+        public readonly string AppFilePath;
         public readonly string AppDirectory;
 
         public AppInfo()
         {
             Version = GetVersion();
             Platform = GetPlatform();
+            AppFilePath = Environment.ProcessPath ?? "Unknown";
             AppDirectory = AppDomain.CurrentDomain.BaseDirectory;
         }
 
