@@ -1,17 +1,17 @@
-﻿using AcSaveConverter.Graphics.Textures;
+﻿using AcSaveConverter.Configuration;
 using AcSaveConverter.Graphics;
+using AcSaveConverter.Graphics.Textures;
 using AcSaveConverter.GUI.Dialogs.Popups.ACFA;
 using AcSaveConverter.GUI.Dialogs.Tabs;
 using AcSaveConverter.IO;
 using AcSaveConverter.IO.Assets;
+using AcSaveConverter.Logging;
 using AcSaveFormats.ACFA;
 using AcSaveFormats.ACFA.Designs;
 using ImGuiNET;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using AcSaveConverter.Configuration;
-using AcSaveConverter.Logging;
 
 namespace AcSaveConverter.GUI.Dialogs.ACFA
 {
@@ -182,7 +182,7 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
                 }
                 catch
                 {
-                    
+
                 }
             }
         }

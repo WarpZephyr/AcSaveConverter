@@ -21,7 +21,7 @@ namespace AcSaveConverter.Graphics
 
         public bool IsDisposed
             => disposedValue;
-        
+
         internal ImGuiTexture(ImGuiTexturePool pool, Texture texture, nint handle)
         {
             Pool = pool;

@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
-using System;
+﻿using System;
+using System.Diagnostics;
 using Veldrid;
-using AcSaveFormats.Textures;
 
 namespace AcSaveConverter.Graphics.Textures
 {

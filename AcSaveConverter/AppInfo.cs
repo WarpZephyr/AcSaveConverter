@@ -56,7 +56,7 @@ namespace AcSaveConverter
             var osVersion = Environment.OSVersion;
             string servicePack = osVersion.ServicePack;
             return string.IsNullOrEmpty(servicePack) ?
-               $"{platform} {osVersion.Version}" : 
+               $"{platform} {osVersion.Version}" :
                $"{platform} {osVersion.Version.ToString(3)} {servicePack}";
         }
     }
