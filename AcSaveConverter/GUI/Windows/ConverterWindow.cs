@@ -187,7 +187,7 @@ namespace AcSaveConverter.GUI.Windows
                 {
                     if (FileTabs[i].Open == false)
                     {
-                        Log.WriteLine($"Closing file tab {FileTabs[i].Name}.");
+                        Log.WriteLine($"Closing file tab \"{FileTabs[i].Name}\".");
                         FileTabs[i].Dispose();
                         FileTabs.RemoveAt(i);
                         continue;

@@ -452,7 +452,7 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
 
         internal static void Validate_Design(Design design)
         {
-            Log.WriteLine($"Validating design {design.DesignName} by {design.DesignerName}.");
+            Log.WriteLine($"Validating design \"{design.DesignName}\" by \"{design.DesignerName}\".");
 
             var tuning = design.Tuning;
             Validate_Tuning(tuning);
