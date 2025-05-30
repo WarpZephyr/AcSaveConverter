@@ -254,26 +254,24 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
                     if (purePs3)
                     {
                         // Only PS3 specific save files are present
-                        return true;
+                        return false;
                     }
                     else if (pureXbox360)
                     {
                         // Only Xbox 360 specific save files are present
-                        return false;
+                        return true;
                     }
 
                     string directoryName = Path.GetFileName(directoryPath);
                     if (directoryName.StartsWith("ASSMBLY"))
                     {
                         // The folder name starts the way an Xbox 360 folder would
-                        // PS3 would start with the region code
                         return true;
                     }
                     else if (directoryName.Length == 19 && directoryName.EndsWith("ASSMBLY064"))
                     {
-                        // The folder name does not start the way an Xbox 360 folder would
-                        // But it does end the way a PS3 folder would
-                        // And it has the same length as a PS3 folder name
+                        // The folder name ends the way a PS3 folder would
+                        // It has the same length as a PS3 folder name
                         return false;
                     }
                 }

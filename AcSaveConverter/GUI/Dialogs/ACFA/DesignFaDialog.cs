@@ -204,7 +204,13 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
             try
             {
                 Log.WriteLine($"Loading {DataType} from path: \"{path}\"");
-                Load_Data(Design.Read(path, DetectUTF16(path), DetectXbox360(path)));
+
+                bool utf16 = DetectUTF16(path);
+                bool xbox360 = DetectXbox360(path);
+
+                Log.WriteLine($"Detected design encoding: {(utf16 ? "UTF16" : "ShiftJIS")}");
+                Log.WriteLine($"Detected design platform: {(xbox360 ? "Xbox 360" : "PS3")}");
+                Load_Data(Design.Read(path, utf16, xbox360));
             }
             catch (Exception ex)
             {
