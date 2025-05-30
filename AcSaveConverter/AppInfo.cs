@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -19,8 +20,8 @@ namespace AcSaveConverter
 
         public AppInfo()
         {
-            Version = GetVersion();
             Platform = GetPlatform();
+            Version = GetVersion();
             AppFilePath = Environment.ProcessPath ?? "Unknown";
             AppDirectory = AppDomain.CurrentDomain.BaseDirectory;
         }
@@ -28,10 +29,10 @@ namespace AcSaveConverter
         private static string GetVersion()
         {
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
-            object[] attributes = executingAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
-            if (attributes.Length > 0)
+            var version = executingAssembly.GetName().Version;
+            if (version != null)
             {
-                return ((AssemblyInformationalVersionAttribute)attributes[0]).InformationalVersion;
+                return version.ToString();
             }
             else
             {
