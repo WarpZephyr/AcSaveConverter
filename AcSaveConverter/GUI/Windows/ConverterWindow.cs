@@ -89,10 +89,13 @@ namespace AcSaveConverter.GUI.Windows
         {
             if (ImGui.BeginMenu("Options"))
             {
-                ImGui.MenuItem("UTF16", "", ref AppConfig.Instance.UTF16);
-                ImGui.MenuItem("Xbox 360", "", ref AppConfig.Instance.Xbox360);
-                ImGui.MenuItem("Auto Detect Encoding", "", ref AppConfig.Instance.AutoDetectEncoding);
+                ImGuiEx.ComboEnum("Platform", ref AppConfig.Instance.Platform);
+                ImGuiEx.ComboEnum("Region", ref AppConfig.Instance.Region);
+                ImGuiEx.ComboEnum("Encoding", ref AppConfig.Instance.Encoding);
+
                 ImGui.MenuItem("Auto Detect Platform", "", ref AppConfig.Instance.AutoDetectPlatform);
+                ImGui.MenuItem("Auto Detect Region", "", ref AppConfig.Instance.AutoDetectRegion);
+                ImGui.MenuItem("Auto Detect Encoding", "", ref AppConfig.Instance.AutoDetectEncoding);
                 ImGui.EndMenu();
             }
         }

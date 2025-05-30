@@ -17,24 +17,70 @@ namespace AcSaveConverter.Configuration
 
     internal class AppConfig
     {
+        #region Static Members
+
+        [JsonIgnore]
         private const string FileName = "config.json";
+
+        [JsonIgnore]
         private static readonly string FolderPath = Program.AppDataFolder;
+
+        [JsonIgnore]
         private static readonly string DataPath = Path.Combine(FolderPath, FileName);
 
-        public bool Xbox360;
-        public bool UTF16;
-        public bool AutoDetectEncoding;
-        public bool AutoDetectPlatform;
+        [JsonIgnore]
+        private const int DefaultConfigVersion = 0;
 
+        [JsonIgnore]
+        private const int CurrentConfigVersion = 1;
+
+        #endregion
+
+        #region Instance Members
+
+        [JsonIgnore]
         internal static AppConfig Instance { get; private set; } = Load();
+
+        #endregion
+
+        #region Settings
+
+        public int ConfigVersion;
+
+        public PlatformType Platform;
+        public RegionType Region;
+        public EncodingType Encoding;
+        
+        public bool AutoDetectPlatform;
+        public bool AutoDetectRegion;
+        public bool AutoDetectEncoding;
+
+        #endregion
+
+        #region Setting Helpers
+
+        [JsonIgnore]
+        internal bool Xbox360
+            => Platform == PlatformType.Xbox360;
+
+        [JsonIgnore]
+        internal bool UTF16
+            => Encoding == EncodingType.UTF16;
+
+        #endregion
 
         public AppConfig()
         {
-            Xbox360 = false;
-            UTF16 = true;
-            AutoDetectEncoding = true;
+            ConfigVersion = CurrentConfigVersion;
+            Platform = PlatformType.PlayStation3;
+            Region = RegionType.US;
+            Encoding = EncodingType.UTF16;
             AutoDetectPlatform = true;
+            AutoDetectRegion = true;
+            AutoDetectEncoding = true;
         }
+
+        #region IO
 
         public static AppConfig Load()
         {
@@ -54,6 +100,14 @@ namespace AcSaveConverter.Configuration
                     var options = new JsonSerializerOptions();
                     config = JsonSerializer.Deserialize(File.ReadAllText(DataPath),
                         AppConfigSerializerContext.Default.AppConfig) ?? throw new Exception("JsonConvert returned null when loading config.");
+
+                    // Update config file
+                    if (config.ConfigVersion < CurrentConfigVersion)
+                    {
+                        Log.WriteLine("Replacing outdated config file.");
+                        config.ConfigVersion = CurrentConfigVersion;
+                        config.Save();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -83,5 +137,7 @@ namespace AcSaveConverter.Configuration
                 Log.WriteLine($"Failed to save app config to path \"{DataPath}\": {ex}");
             }
         }
+
+        #endregion
     }
 }
