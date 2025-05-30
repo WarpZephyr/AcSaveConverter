@@ -10,6 +10,7 @@ namespace AcSaveConverter.Logging
         private readonly StringBuilder Buffer;
         private readonly Timer Timer;
         private bool TimerStopped;
+        private bool TimerLocked;
         private bool BufferDumped;
         private bool disposedValue;
         private int IntervalSecondsField;
@@ -33,16 +34,16 @@ namespace AcSaveConverter.Logging
         public bool IsDisposed
             => disposedValue;
 
-        public Logger(int writeThreshold, int intervalSeconds, int forceWriteThreshold, bool start)
+        public Logger(int writeThreshold, int intervalMilliseconds, int forceWriteThreshold, bool start)
         {
             WriteThreshold = writeThreshold;
 
             // Avoid setting new timer interval here as we are constructing
-            IntervalSecondsField = intervalSeconds;
+            IntervalSecondsField = intervalMilliseconds;
             ForceWriteThreshold = forceWriteThreshold;
 
             Buffer = new StringBuilder();
-            Timer = new Timer(TimeSpan.FromSeconds(intervalSeconds));
+            Timer = new Timer(TimeSpan.FromMilliseconds(intervalMilliseconds));
             Timer.Elapsed += TimedBufferDump;
             BufferDumped = true;
             TimerStopped = true;
@@ -58,12 +59,7 @@ namespace AcSaveConverter.Logging
             // Pause the timer to save on resources when there's nothing to write.
             if (BufferDumped)
             {
-                if (!TimerStopped)
-                {
-                    Timer.Stop();
-                    TimerStopped = true;
-                }
-
+                StopTimer();
                 return;
             }
 
@@ -102,10 +98,7 @@ namespace AcSaveConverter.Logging
         {
             WriteCount++;
             BufferDumped = false;
-            if (TimerStopped)
-            {
-                Timer.Start();
-            }
+            StartTimer();
         }
 
         public void Write(string value)
@@ -153,6 +146,32 @@ namespace AcSaveConverter.Logging
             BufferDumped = true;
             Buffer.Clear();
             WriteCount = 0;
+        }
+
+        public void LockTimer()
+        {
+            TimerLocked = true;
+        }
+
+        public void UnlockTimer()
+        {
+            TimerLocked = false;
+        }
+
+        private void StartTimer()
+        {
+            if (!TimerLocked)
+            {
+                Start();
+            }
+        }
+
+        private void StopTimer()
+        {
+            if (!TimerLocked)
+            {
+                Stop();
+            }
         }
 
         public void Start()

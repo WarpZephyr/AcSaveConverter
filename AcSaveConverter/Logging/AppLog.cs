@@ -25,6 +25,7 @@ namespace AcSaveConverter.Logging
         private readonly Logger Log;
         private readonly StreamWriter? FileLog;
         private readonly object LogLock;
+        private DateTime StartTime;
         private bool disposedValue;
 
         #endregion
@@ -33,7 +34,7 @@ namespace AcSaveConverter.Logging
 
         static AppLog()
         {
-            var logger = new Logger(5, 3, 3, true);
+            var logger = new Logger(5, 300, 3, true);
 
             Exception? error;
             StreamWriter? fileLog;
@@ -65,6 +66,8 @@ namespace AcSaveConverter.Logging
             LogLock = new object();
             Log = log;
             FileLog = fileLog;
+            StartTime = DateTime.Now;
+
             PrintTimeInfo();
             PrintAppInfo();
         }
@@ -77,7 +80,7 @@ namespace AcSaveConverter.Logging
 
         private void PrintTimeInfo()
         {
-            WriteLine($"[Log Started: {DateTime.Now:MM-dd-yyyy-hh:mm:ss}]");
+            WriteLine($"[Log Started: {StartTime:MM-dd-yyyy-hh:mm:ss}]");
         }
 
         private void PrintAppInfo()
@@ -170,7 +173,9 @@ namespace AcSaveConverter.Logging
             {
                 if (disposing)
                 {
-                    WriteLine($"[Log Ended: {DateTime.Now:MM-dd-yyyy-hh:mm:ss}]");
+                    var endTime = DateTime.Now;
+                    WriteLine($"[Run Time: {endTime - StartTime}]");
+                    WriteLine($"[Log Ended: {endTime:MM-dd-yyyy-hh:mm:ss}]");
 
                     Flush();
                     Log.Dispose();

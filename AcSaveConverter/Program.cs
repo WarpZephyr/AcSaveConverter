@@ -1,4 +1,5 @@
-﻿using AcSaveConverter.Graphics;
+﻿using AcSaveConverter.Configuration;
+using AcSaveConverter.Graphics;
 using AcSaveConverter.GUI.Windows;
 using AcSaveConverter.Logging;
 
@@ -28,6 +29,9 @@ namespace AcSaveConverter
 
             Log.DirectWriteLine($"Running {AppName}.");
             graphics.Run();
+
+            Log.DirectWriteLine("Saving config.");
+            AppConfig.Instance.Save();
 
             Log.DirectWriteLine($"Closing {AppName}.");
             Dispose();
