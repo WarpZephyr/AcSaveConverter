@@ -1,9 +1,11 @@
 ﻿using AcSaveConverter.Graphics;
 using AcSaveConverter.GUI.Dialogs.Tabs;
 using AcSaveConverter.IO;
+using AcSaveConverter.Logging;
 using AcSaveFormats.ACFA;
 using AcSaveFormats.ACFA.Colors;
 using ImGuiNET;
+using NativeFileDialogSharp;
 using System;
 using System.Drawing;
 using System.Numerics;
@@ -17,6 +19,8 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
         private static Vector2 PaletteButtonSize = new Vector2(20, 20);
 
         public string Name { get; set; }
+        public string DataType
+            => "Paint";
 
         public Paint Paint { get; set; }
 
@@ -126,7 +130,15 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
 
         public void Load_Data(string path)
         {
-            Load_Data(Paint.Read(path));
+            try
+            {
+                Log.WriteLine($"Loading {DataType} from path: \"{path}\"");
+                Load_Data(Paint.Read(path));
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine($"Failed to load {DataType} from path \"{path}\": {ex}");
+            }
         }
 
         public bool IsData(string path)

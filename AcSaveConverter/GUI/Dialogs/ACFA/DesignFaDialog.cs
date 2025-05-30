@@ -10,6 +10,8 @@ using ImGuiNET;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using AcSaveConverter.Configuration;
+using AcSaveConverter.Logging;
 
 namespace AcSaveConverter.GUI.Dialogs.ACFA
 {
@@ -21,14 +23,15 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
 
         public string Name { get; set; }
 
+        public string DataType
+            => "Design";
+
         private bool disposedValue;
         public bool IsDisposed
             => disposedValue;
 
         public Design Design { get; private set; }
         private ImGuiTexture ThumbnailCache;
-        private bool UTF16;
-        private bool Xbox;
 
         private readonly AcColorSetPopup ColorsPopup;
 
@@ -50,9 +53,6 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
 
             ThumbnailCache = DefaultThumbnailCache;
             IsDefaultThumbnail = true;
-
-            UTF16 = true;
-            Xbox = false;
 
             ColorsPopup = new AcColorSetPopup("AC Colors", Design.Colors);
         }
@@ -87,7 +87,6 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
             if (ImGui.BeginMenuBar())
             {
                 Render_FileMenu();
-                Render_OptionsMenu();
                 ImGui.EndMenuBar();
             }
         }
@@ -105,16 +104,6 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
                     }
                 }
 
-                ImGui.EndMenu();
-            }
-        }
-
-        void Render_OptionsMenu()
-        {
-            if (ImGui.BeginMenu("Options"))
-            {
-                ImGui.MenuItem("UTF16", "", ref UTF16);
-                ImGui.MenuItem("Xbox", "", ref Xbox);
                 ImGui.EndMenu();
             }
         }
@@ -184,7 +173,7 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
                     string? path = FileDialog.OpenFile("dds;bin");
                     if (FileDialog.ValidFile(path))
                     {
-                        if (ImportThumbnail(path, Xbox, Design.Thumbnail, out Thumbnail? output))
+                        if (ImportThumbnail(path, AppConfig.Instance.Xbox360, Design.Thumbnail, out Thumbnail? output))
                         {
                             Design.Thumbnail = output;
                             RebuildThumbnailCache();
@@ -212,17 +201,54 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
 
         public void Load_Data(string path)
         {
-            Load_Data(Design.Read(path, UTF16, Xbox));
+            try
+            {
+                Log.WriteLine($"Loading {DataType} from path: \"{path}\"");
+                Load_Data(Design.Read(path, DetectUTF16(path), DetectXbox360(path)));
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine($"Failed to load {DataType} from path \"{path}\": {ex}");
+            }
         }
 
-        public bool IsData(string file)
+        public bool IsData(string path)
         {
-            return file.EndsWith("ACDES.DAT", StringComparison.InvariantCultureIgnoreCase);
+            return path.EndsWith("ACDES.DAT", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public void Save_Data(string path)
+        #endregion
+
+        #region Detection
+
+        private static bool DetectUTF16(string file)
         {
-            Design.Write(path);
+            if (AppConfig.Instance.AutoDetectEncoding)
+            {
+                var fileInfo = new FileInfo(file);
+                long length = fileInfo.Length;
+                if (length == 24280)
+                {
+                    // A 2-byte encoding is being used
+                    // Which should be UTF16
+                    return true;
+                }
+                else if (length == 24184)
+                {
+                    // A 1-byte encoding is being used
+                    // Which should be ShiftJIS
+                    return false;
+                }
+            }
+
+            // Encoding state could not be determined automatically or we choose to manually override it
+            return AppConfig.Instance.UTF16;
+        }
+
+        private static bool DetectXbox360(string file)
+        {
+            // Design data won't be purely alone on Xbox 360 like it is on PS3
+            return false;
         }
 
         #endregion
@@ -278,13 +304,24 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
             var totalFrsConsumed = 0;
             for (int i = 0; i < tunes.Length; i++)
             {
-                tunes[i] = Math.Clamp(tunes[i], minTune, maxTune);
+                byte value = tunes[i];
+                byte clamped = Math.Clamp(value, minTune, maxTune);
+                if (value != clamped)
+                {
+                    Log.WriteLine($"Detected invalid tune value range: {value}");
+                    Log.WriteLine($"Clamping invalid tune value to: {clamped}");
+                }
+
+                tunes[i] = clamped;
                 totalFrsConsumed += tunes[i];
             }
 
             int remaining = totalFrsConsumed - maxFrs;
             if (remaining > 0)
             {
+                Log.WriteLine($"Detected overtuning with a total FRS consumption of: {totalFrsConsumed}");
+                Log.WriteLine("Removing tuning points until balanced.");
+
                 for (int i = tunes.Length - 1; i >= 0; i--)
                 {
                     if (tunes[i] == maxTune)
@@ -358,6 +395,8 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
                 const ushort debugPartRange = 9000;
                 if (part >= debugPartRange)
                 {
+                    Log.WriteLine($"Detected debug part ID: {part}");
+                    Log.WriteLine($"Changing debug part ID to default: {defaultValue}");
                     return defaultValue;
                 }
 
@@ -407,6 +446,8 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
 
         internal static void Validate_Design(Design design)
         {
+            Log.WriteLine($"Validating design {design.DesignName} by {design.DesignerName}.");
+
             var tuning = design.Tuning;
             Validate_Tuning(tuning);
             Validate_Parts(design.Parts);

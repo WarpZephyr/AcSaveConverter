@@ -11,6 +11,8 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
     {
         private readonly ImGuiGraphicsContext Graphics;
         public string Name { get; set; }
+        public string DataType
+            => "Player Data";
 
         public PlayerData PlayerData { get; private set; }
         private string PlayTimeStringCache;

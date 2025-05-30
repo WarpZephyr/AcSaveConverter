@@ -1,5 +1,6 @@
 ﻿using AcSaveConverter.Graphics;
 using AcSaveConverter.GUI.Dialogs.Tabs;
+using AcSaveConverter.Logging;
 using ImGuiNET;
 using System.Collections.Generic;
 using System.Numerics;
@@ -112,6 +113,7 @@ namespace AcSaveConverter.GUI.Dialogs.Popups
                 NewTabName = "New Tab";
             }
 
+            Log.WriteLine($"Creating new {SelectedGame} tab.");
             switch (SelectedGame)
             {
                 case GameType.ACFA:

@@ -4,7 +4,7 @@ namespace AcSaveConverter.IO.Assets
 {
     internal static class FontPath
     {
-        public static readonly string AssetsFolder = Path.Combine(Program.AppFolder, "Assets");
+        public static readonly string AssetsFolder = Path.Combine(Program.AppDataFolder, "Assets");
         public static readonly string FontsFolder = Path.Combine(AssetsFolder, "Fonts");
 
         public static string GetFontPath(string font)

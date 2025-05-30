@@ -8,6 +8,9 @@ using AcSaveFormats.ACFA.Designs;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using AcSaveConverter.Configuration;
+using System.IO;
+using AcSaveConverter.Logging;
 namespace AcSaveConverter.GUI.Dialogs.ACFA
 {
     internal class DesignDocumentFaDialog : IDataTab
@@ -16,13 +19,14 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
         private bool disposedValue;
 
         public string Name { get; set; }
+        public string DataType
+            => "Design Document";
+
         public bool IsDisposed
             => disposedValue;
 
         public DesignDocument DesignDocument { get; private set; }
         private readonly List<ImGuiTexture> ThumbnailCache;
-        private bool UTF16;
-        private bool Xbox;
 
         private readonly AcColorSetPopup ColorsPopup;
 
@@ -35,9 +39,6 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
             DesignDocument = data;
             ThumbnailCache = [];
             RebuildThumbnailCache();
-
-            UTF16 = true;
-            Xbox = false;
 
             ColorsPopup = new AcColorSetPopup("AC Colors", new AcSaveFormats.ACFA.Colors.AcColorSet());
         }
@@ -58,7 +59,6 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
             if (ImGui.BeginMenuBar())
             {
                 Render_FileMenu();
-                Render_OptionsMenu();
                 ImGui.EndMenuBar();
             }
         }
@@ -76,16 +76,6 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
                     }
                 }
 
-                ImGui.EndMenu();
-            }
-        }
-
-        void Render_OptionsMenu()
-        {
-            if (ImGui.BeginMenu("Options"))
-            {
-                ImGui.MenuItem("UTF16", "", ref UTF16);
-                ImGui.MenuItem("Xbox", "", ref Xbox);
                 ImGui.EndMenu();
             }
         }
@@ -127,26 +117,34 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
         {
             if (ImGui.Button("Export"))
             {
-                const StringComparison comp = StringComparison.InvariantCultureIgnoreCase;
-                string? path = FileDialog.GetSaveFilePath("png;jpg;bmp;dds");
-                if (FileDialog.ValidSavePath(path))
+                try
                 {
-                    if (path.EndsWith(".png", comp))
+                    const StringComparison comp = StringComparison.InvariantCultureIgnoreCase;
+                    string? path = FileDialog.GetSaveFilePath("png;jpg;bmp;dds");
+                    if (FileDialog.ValidSavePath(path))
                     {
-                        TextureSave.ExportPng(path, design.Thumbnail.GetDDSBytes());
+                        Log.WriteLine($"Exporting thumbnail to: {path}");
+                        if (path.EndsWith(".png", comp))
+                        {
+                            TextureSave.ExportPng(path, design.Thumbnail.GetDDSBytes());
+                        }
+                        else if (path.EndsWith(".jpg", comp) || path.EndsWith(".jpeg", comp))
+                        {
+                            TextureSave.ExportJpeg(path, design.Thumbnail.GetDDSBytes());
+                        }
+                        else if (path.EndsWith(".bmp", comp))
+                        {
+                            TextureSave.ExportBmp(path, design.Thumbnail.GetDDSBytes());
+                        }
+                        else if (path.EndsWith(".dds", comp))
+                        {
+                            TextureSave.ExportDDS(path, design.Thumbnail.GetDDSBytes());
+                        }
                     }
-                    else if (path.EndsWith(".jpg", comp) || path.EndsWith(".jpeg", comp))
-                    {
-                        TextureSave.ExportJpeg(path, design.Thumbnail.GetDDSBytes());
-                    }
-                    else if (path.EndsWith(".bmp", comp))
-                    {
-                        TextureSave.ExportBmp(path, design.Thumbnail.GetDDSBytes());
-                    }
-                    else if (path.EndsWith(".dds", comp))
-                    {
-                        TextureSave.ExportDDS(path, design.Thumbnail.GetDDSBytes());
-                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.WriteLine($"Failed to export: {ex}");
                 }
             }
 
@@ -157,16 +155,17 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
                     string? path = FileDialog.OpenFile("dds;bin");
                     if (FileDialog.ValidFile(path))
                     {
-                        if (DesignFaDialog.ImportThumbnail(path, Xbox, design.Thumbnail, out Thumbnail? output))
+                        Log.WriteLine($"Importing thumbnail from: {path}");
+                        if (DesignFaDialog.ImportThumbnail(path, AppConfig.Instance.Xbox360, design.Thumbnail, out Thumbnail? output))
                         {
                             design.Thumbnail = output;
                             ReloadThumbnailCache(index);
                         }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    Log.WriteLine($"Failed to import: {ex}");
                 }
             }
         }
@@ -182,14 +181,106 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
             RebuildThumbnailCache();
         }
 
-        public void Load_Data(string file)
+        public void Load_Data(string path)
         {
-            Load_Data(DesignDocument.Read(file, UTF16, Xbox));
+            try
+            {
+                Log.WriteLine($"Loading {DataType} from path: \"{path}\"");
+
+                bool utf16 = DetectUTF16(path);
+                bool xbox360 = DetectXbox360(path);
+
+                Log.WriteLine($"Detected design document encoding: {(utf16 ? "UTF16" : "ShiftJIS")}");
+                Log.WriteLine($"Detected design document platform: {(xbox360 ? "Xbox 360" : "PS3")}");
+                Load_Data(DesignDocument.Read(path, utf16, xbox360));
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine($"Failed to load {DataType} from path \"{path}\": {ex}");
+            }
         }
 
-        public bool IsData(string file)
+        public bool IsData(string path)
         {
-            return file.EndsWith("DESDOC.DAT", StringComparison.InvariantCultureIgnoreCase);
+            return path.EndsWith("DESDOC.DAT", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        #endregion
+
+        #region Detection
+
+        private static bool DetectUTF16(string file)
+        {
+            if (AppConfig.Instance.AutoDetectEncoding)
+            {
+                var fileInfo = new FileInfo(file);
+                long length = fileInfo.Length;
+                if (length == 4856328)
+                {
+                    // A 2-byte encoding is being used
+                    // Which should be UTF16
+                    return true;
+                }
+                else if (length == 4837128)
+                {
+                    // A 1-byte encoding is being used
+                    // Which should be ShiftJIS
+                    return false;
+                }
+            }
+
+            // Encoding state could not be determined automatically or we choose to manually override it
+            return AppConfig.Instance.UTF16;
+        }
+
+        private static bool DetectXbox360(string file)
+        {
+            if (AppConfig.Instance.AutoDetectPlatform)
+            {
+                string? directoryPath = Path.GetDirectoryName(file);
+                if (!string.IsNullOrEmpty(directoryPath))
+                {
+                    bool xboxThumbnailExists = File.Exists(Path.Combine(directoryPath, "__thumbnail.png"));
+                    bool ps3ParamSfoExists = File.Exists(Path.Combine(directoryPath, "PARAM.SFO"));
+                    bool ps3IconExists = File.Exists(Path.Combine(directoryPath, "ICON0.PNG"));
+                    bool ps3PictureExists = File.Exists(Path.Combine(directoryPath, "PIC1.PNG"));
+
+                    bool hasPs3 = ps3ParamSfoExists || ps3IconExists || ps3PictureExists;
+                    bool hasXbox360 = xboxThumbnailExists;
+
+                    bool purePs3 = hasPs3 && !hasXbox360;
+                    bool pureXbox360 = hasXbox360 && !hasPs3;
+
+                    if (purePs3)
+                    {
+                        // Only PS3 specific save files are present
+                        return true;
+                    }
+                    else if (pureXbox360)
+                    {
+                        // Only Xbox 360 specific save files are present
+                        return false;
+                    }
+
+                    string directoryName = Path.GetFileName(directoryPath);
+                    if (directoryName.StartsWith("ASSMBLY"))
+                    {
+                        // The folder name starts the way an Xbox 360 folder would
+                        // PS3 would start with the region code
+                        return true;
+                    }
+                    else if (directoryName.Length == 19 && directoryName.EndsWith("ASSMBLY064"))
+                    {
+                        // The folder name does not start the way an Xbox 360 folder would
+                        // But it does end the way a PS3 folder would
+                        // And it has the same length as a PS3 folder name
+                        return false;
+                    }
+                }
+            }
+
+            // Platform state could not be determined automatically or we choose to manually override it
+            return AppConfig.Instance.Xbox360;
         }
 
         #endregion

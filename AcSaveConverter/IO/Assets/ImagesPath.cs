@@ -4,7 +4,7 @@ namespace AcSaveConverter.IO.Assets
 {
     internal static class ImagesPath
     {
-        public static readonly string AssetsFolder = Path.Combine(Program.AppFolder, "Assets");
+        public static readonly string AssetsFolder = Path.Combine(Program.AppDataFolder, "Assets");
         public static readonly string ImagesFolder = Path.Combine(AssetsFolder, "Images");
 
         public static string GetImagePath(string image)

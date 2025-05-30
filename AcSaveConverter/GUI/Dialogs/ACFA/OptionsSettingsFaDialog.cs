@@ -1,6 +1,7 @@
 ﻿using AcSaveConverter.Graphics;
 using AcSaveConverter.GUI.Dialogs.Tabs;
 using AcSaveConverter.IO;
+using AcSaveConverter.Logging;
 using AcSaveFormats.ACFA;
 using ImGuiNET;
 using System;
@@ -11,6 +12,8 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
     {
         private readonly ImGuiGraphicsContext Graphics;
         public string Name { get; set; }
+        public string DataType
+            => "Options/Settings";
 
         public OptionsSettings OptionsSettings { get; private set; }
 
@@ -135,12 +138,20 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
 
         public void Load_Data(string path)
         {
-            OptionsSettings = OptionsSettings.Read(path);
+            try
+            {
+                Log.WriteLine($"Loading {DataType} from path: \"{path}\"");
+                Load_Data(OptionsSettings.Read(path));
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine($"Failed to load {DataType} from path \"{path}\": {ex}");
+            }
         }
 
-        public bool IsData(string file)
+        public bool IsData(string path)
         {
-            return file.EndsWith("OSET.DAT", StringComparison.InvariantCultureIgnoreCase);
+            return path.EndsWith("OSET.DAT", StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion

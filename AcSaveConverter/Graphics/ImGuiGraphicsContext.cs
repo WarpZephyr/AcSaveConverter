@@ -1,5 +1,6 @@
 ﻿using AcSaveConverter.Graphics.Fonts;
 using AcSaveConverter.IO.Assets;
+using AcSaveConverter.Logging;
 using ImGuiNET;
 using System;
 using System.Diagnostics;
@@ -33,6 +34,7 @@ namespace AcSaveConverter.Graphics
             var outDesc = framebuffer.OutputDescription;
             int bwidth = (int)framebuffer.Width;
             int bheight = (int)framebuffer.Height;
+
             ImGuiRenderer = new ImGuiRenderer(GraphicsDevice, outDesc, bwidth, bheight);
             CommandList = GraphicsDevice.ResourceFactory.CreateCommandList();
             TexturePool = new ImGuiTexturePool(GraphicsDevice, GraphicsDevice.ResourceFactory, CommandList, ImGuiRenderer);
@@ -53,6 +55,8 @@ namespace AcSaveConverter.Graphics
         // Credit for this code goes to Smithbox and by extension DSMapStudio
         private unsafe void SetupFonts()
         {
+            Log.DirectWriteLine("Setting up fonts for graphics.");
+
             ImGui.EndFrame();
             string engFontPath = FontPath.GetFontPath("RobotoMono-Light.ttf");
             string otherFontPath = FontPath.GetFontPath("NotoSansCJKtc-Light.otf");

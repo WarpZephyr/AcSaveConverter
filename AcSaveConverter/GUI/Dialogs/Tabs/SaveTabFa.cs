@@ -3,6 +3,7 @@ using AcSaveConverter.GUI.Dialogs.ACFA;
 using AcSaveConverter.GUI.Dialogs.Popups;
 using AcSaveConverter.IO;
 using AcSaveConverter.IO.Assets;
+using AcSaveConverter.Logging;
 using AcSaveConverter.Saves;
 using AcSaveFormats.ACFA;
 using AcSaveFormats.ACFA.PS3;
@@ -177,6 +178,8 @@ namespace AcSaveConverter.GUI.Dialogs.Tabs
 
         void Load_Folder(string folder)
         {
+            Log.WriteLine($"Loading ACFA save files from folder: \"{folder}\"");
+
             foreach (string file in Directory.EnumerateFiles(folder, "*", SearchOption.TopDirectoryOnly))
             {
                 // Load first if it exists
@@ -528,7 +531,6 @@ namespace AcSaveConverter.GUI.Dialogs.Tabs
             string? path = FileDialog.OpenFolder();
             if (!FileDialog.ValidFolder(path))
             {
-                // TODO: Handle
                 return;
             }
 
@@ -545,23 +547,28 @@ namespace AcSaveConverter.GUI.Dialogs.Tabs
             switch (CurrentExportKind)
             {
                 case ExportKind.GameData:
-
                     if (xbox)
                     {
+                        Log.WriteLine($"Exporting {region} Xbox 360 game data save to folder: {folder}");
                         Export_GameData_Xbox360(folder);
                     }
                     else
                     {
+                        Log.WriteLine($"Exporting {region} PS3 game data save to folder: {folder}");
                         Export_GameData_PS3(folder, jp);
                     }
                     break;
                 case ExportKind.DesignDocument:
+                    Log.WriteLine($"Exporting {region} {(xbox ? "Xbox 360" : "PS3")} design document save to folder: {folder}");
                     Export_DesignDocument(folder, xbox, jp);
                     break;
                 case ExportKind.Paint:
+                    Log.WriteLine($"Exporting {region} {(xbox ? "Xbox 360" : "PS3")} paint save to folder: {folder}");
                     Export_Paint(folder, xbox, jp);
                     break;
             }
+
+            Log.WriteLine("Finished export.");
         }
 
         #endregion

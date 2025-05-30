@@ -1,11 +1,15 @@
-﻿using AcSaveConverter.Graphics;
+﻿using AcSaveConverter.Configuration;
+using AcSaveConverter.Graphics;
 using AcSaveConverter.GUI.Dialogs.ACFA;
 using AcSaveConverter.GUI.Dialogs.Popups;
 using AcSaveConverter.GUI.Dialogs.Tabs;
+using AcSaveConverter.IO;
+using AcSaveConverter.Logging;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Numerics;
 
 namespace AcSaveConverter.GUI.Windows
@@ -62,6 +66,8 @@ namespace AcSaveConverter.GUI.Windows
             if (ImGui.BeginMenuBar())
             {
                 Render_FileMenu();
+                Render_OptionsMenu();
+                Render_OtherMenu();
                 Render_ImGuiMenu();
                 ImGui.EndMenuBar();
             }
@@ -74,6 +80,31 @@ namespace AcSaveConverter.GUI.Windows
                 if (ImGui.MenuItem("New Tab"))
                 {
                     NewTabPopup.OpenPopup = true;
+                }
+
+                ImGui.EndMenu();
+            }
+        }
+
+        void Render_OptionsMenu()
+        {
+            if (ImGui.BeginMenu("Options"))
+            {
+                ImGui.MenuItem("UTF16", "", ref AppConfig.Instance.UTF16);
+                ImGui.MenuItem("Xbox 360", "", ref AppConfig.Instance.Xbox360);
+                ImGui.MenuItem("Auto Detect Encoding", "", ref AppConfig.Instance.AutoDetectEncoding);
+                ImGui.MenuItem("Auto Detect Platform", "", ref AppConfig.Instance.AutoDetectPlatform);
+                ImGui.EndMenu();
+            }
+        }
+
+        void Render_OtherMenu()
+        {
+            if (ImGui.BeginMenu("Other"))
+            {
+                if (ImGui.MenuItem("Open Data Folder"))
+                {
+                    Explorer.OpenFolder(Program.AppDataFolder);
                 }
 
                 ImGui.EndMenu();
@@ -157,6 +188,7 @@ namespace AcSaveConverter.GUI.Windows
                 {
                     if (FileTabs[i].Open == false)
                     {
+                        Log.WriteLine($"Closing file tab {FileTabs[i].Name}.");
                         FileTabs[i].Dispose();
                         FileTabs.RemoveAt(i);
                         continue;

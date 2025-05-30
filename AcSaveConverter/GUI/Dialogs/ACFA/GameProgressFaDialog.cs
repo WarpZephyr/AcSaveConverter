@@ -1,6 +1,7 @@
 ﻿using AcSaveConverter.Graphics;
 using AcSaveConverter.GUI.Dialogs.Tabs;
 using AcSaveConverter.IO;
+using AcSaveConverter.Logging;
 using AcSaveFormats.ACFA;
 using ImGuiNET;
 using System;
@@ -11,6 +12,8 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
     {
         private readonly ImGuiGraphicsContext Graphics;
         public string Name { get; set; }
+        public string DataType
+            => "Game Progress";
 
         public GameProgress GameProgress { get; private set; }
 
@@ -101,13 +104,20 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
 
         public void Load_Data(string path)
         {
-            GameProgress = GameProgress.Read(path);
-            Validate_GameProgress();
+            try
+            {
+                Log.WriteLine($"Loading {DataType} from path: \"{path}\"");
+                Load_Data(GameProgress.Read(path));
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine($"Failed to load {DataType} from path \"{path}\": {ex}");
+            }
         }
 
-        public bool IsData(string file)
+        public bool IsData(string path)
         {
-            return file.EndsWith("GPROG.DAT", StringComparison.InvariantCultureIgnoreCase);
+            return path.EndsWith("GPROG.DAT", StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -116,7 +126,15 @@ namespace AcSaveConverter.GUI.Dialogs.ACFA
 
         void Validate_GameProgress()
         {
-            GameProgress.FrsAmount = Math.Clamp(GameProgress.FrsAmount, 0, 442);
+            var frsAmount = GameProgress.FrsAmount;
+            var clamped = Math.Clamp(GameProgress.FrsAmount, 0, 442);
+            if (frsAmount != clamped)
+            {
+                Log.WriteLine($"Detected invalid FRS amount: {frsAmount}");
+                Log.WriteLine($"Clamping FRS amount to: {clamped}");
+            }
+
+            GameProgress.FrsAmount = clamped;
         }
 
         #endregion
