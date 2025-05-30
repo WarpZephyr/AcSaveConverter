@@ -1,6 +1,6 @@
-﻿using AcSaveConverterImGui.Graphics;
-using AcSaveConverterImGui.GUI.Dialogs.Tabs;
-using AcSaveConverterImGui.IO;
+﻿using AcSaveConverter.Graphics;
+using AcSaveConverter.GUI.Dialogs.Tabs;
+using AcSaveConverter.IO;
 using AcSaveFormats.ACFA;
 using AcSaveFormats.ACFA.Colors;
 using ImGuiNET;
@@ -8,7 +8,7 @@ using System;
 using System.Drawing;
 using System.Numerics;
 
-namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
+namespace AcSaveConverter.GUI.Dialogs.ACFA
 {
     public class PaintFaDialog : IDataTab
     {

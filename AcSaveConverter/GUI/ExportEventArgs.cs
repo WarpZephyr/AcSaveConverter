@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AcSaveConverterImGui.GUI
+namespace AcSaveConverter.GUI
 {
     public class ExportEventArgs : EventArgs
     {

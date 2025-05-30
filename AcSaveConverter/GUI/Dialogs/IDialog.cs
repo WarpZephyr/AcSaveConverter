@@ -1,4 +1,4 @@
-﻿namespace AcSaveConverterImGui.GUI.Dialogs
+﻿namespace AcSaveConverter.GUI.Dialogs
 {
     public interface IDialog
     {

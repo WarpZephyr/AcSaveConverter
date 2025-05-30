@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using NativeLibrary = NativeLibraryLoader.NativeLibrary;
 
-namespace AcSaveConverterImGui.Native
+namespace AcSaveConverter.Native
 {
     public static unsafe class Sdl2NativeEx
     {

@@ -1,6 +1,6 @@
 ﻿using Veldrid.Sdl2;
 
-namespace AcSaveConverterImGui.Native
+namespace AcSaveConverter.Native
 {
     public static class Sdl2Ex
     {

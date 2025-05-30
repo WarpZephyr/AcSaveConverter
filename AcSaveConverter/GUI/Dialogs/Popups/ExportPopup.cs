@@ -2,7 +2,7 @@
 using System;
 using System.Numerics;
 
-namespace AcSaveConverterImGui.GUI.Dialogs.Popups
+namespace AcSaveConverter.GUI.Dialogs.Popups
 {
     public class ExportPopup : IPopup
     {

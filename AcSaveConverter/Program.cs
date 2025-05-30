@@ -1,8 +1,8 @@
-﻿using AcSaveConverterImGui.Graphics;
-using AcSaveConverterImGui.GUI.Windows;
+﻿using AcSaveConverter.Graphics;
+using AcSaveConverter.GUI.Windows;
 using System;
 
-namespace AcSaveConverterImGui
+namespace AcSaveConverter
 {
     internal class Program
     {

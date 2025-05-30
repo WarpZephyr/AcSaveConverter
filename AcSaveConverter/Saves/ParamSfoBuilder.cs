@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace AcSaveConverterImGui.Saves
+namespace AcSaveConverter.Saves
 {
     public class ParamSfoBuilder
     {

@@ -1,4 +1,4 @@
-﻿namespace AcSaveConverterImGui.Graphics
+﻿namespace AcSaveConverter.Graphics
 {
     public class UI
     {

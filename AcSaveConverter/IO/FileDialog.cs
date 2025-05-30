@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
-namespace AcSaveConverterImGui.IO
+namespace AcSaveConverter.IO
 {
     public static class FileDialog
     {

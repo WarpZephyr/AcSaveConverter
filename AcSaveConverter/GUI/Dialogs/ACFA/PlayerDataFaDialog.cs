@@ -1,11 +1,11 @@
-﻿using AcSaveConverterImGui.Graphics;
-using AcSaveConverterImGui.GUI.Dialogs.Tabs;
-using AcSaveConverterImGui.IO;
+﻿using AcSaveConverter.Graphics;
+using AcSaveConverter.GUI.Dialogs.Tabs;
+using AcSaveConverter.IO;
 using AcSaveFormats.ACFA;
 using ImGuiNET;
 using System;
 
-namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
+namespace AcSaveConverter.GUI.Dialogs.ACFA
 {
     internal class PlayerDataFaDialog : IDataTab
     {

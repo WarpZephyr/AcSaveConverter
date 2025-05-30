@@ -1,4 +1,4 @@
-﻿namespace AcSaveConverterImGui
+﻿namespace AcSaveConverter
 {
     public enum PlatformType
     {

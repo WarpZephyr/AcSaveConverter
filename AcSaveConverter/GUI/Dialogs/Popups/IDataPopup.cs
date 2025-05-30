@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AcSaveConverterImGui.GUI.Dialogs.Popups
+namespace AcSaveConverter.GUI.Dialogs.Popups
 {
     public interface IDataPopup : IDialog, IClosable, INamed, IDisposable
     {

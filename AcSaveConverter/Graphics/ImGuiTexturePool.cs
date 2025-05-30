@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using Veldrid;
 using Veldrid.ImageSharp;
 
-namespace AcSaveConverterImGui.Graphics
+namespace AcSaveConverter.Graphics
 {
     public class ImGuiTexturePool
     {

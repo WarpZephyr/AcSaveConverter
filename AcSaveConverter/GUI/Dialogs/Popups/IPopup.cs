@@ -1,4 +1,4 @@
-﻿namespace AcSaveConverterImGui.GUI.Dialogs.Popups
+﻿namespace AcSaveConverter.GUI.Dialogs.Popups
 {
     public interface IPopup : IDialog, IClosable
     {

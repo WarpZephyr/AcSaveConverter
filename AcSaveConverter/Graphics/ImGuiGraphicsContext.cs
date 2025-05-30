@@ -1,5 +1,5 @@
-﻿using AcSaveConverterImGui.Graphics.Fonts;
-using AcSaveConverterImGui.IO.Assets;
+﻿using AcSaveConverter.Graphics.Fonts;
+using AcSaveConverter.IO.Assets;
 using ImGuiNET;
 using System;
 using System.Diagnostics;
@@ -9,7 +9,7 @@ using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 
-namespace AcSaveConverterImGui.Graphics
+namespace AcSaveConverter.Graphics
 {
     public class ImGuiGraphicsContext : IDisposable
     {

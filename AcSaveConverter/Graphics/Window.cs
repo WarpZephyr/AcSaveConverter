@@ -1,10 +1,10 @@
-﻿using AcSaveConverterImGui.Native;
+﻿using AcSaveConverter.Native;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Veldrid;
 using Veldrid.Sdl2;
 
-namespace AcSaveConverterImGui.Graphics
+namespace AcSaveConverter.Graphics
 {
     public class Window : IWindow
     {

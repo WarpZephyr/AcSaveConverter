@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AcSaveConverterImGui.GUI.Dialogs.Tabs
+namespace AcSaveConverter.GUI.Dialogs.Tabs
 {
     public interface IDataTab : IDialog, INamed, IDisposable
     {

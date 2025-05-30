@@ -3,7 +3,7 @@ using System;
 using System.Numerics;
 using Veldrid;
 
-namespace AcSaveConverterImGui.Graphics
+namespace AcSaveConverter.Graphics
 {
     public class ImGuiTexture : IDisposable
     {

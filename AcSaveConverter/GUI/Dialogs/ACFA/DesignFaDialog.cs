@@ -1,9 +1,9 @@
 ﻿using AcSaveConverter.Graphics.Textures;
-using AcSaveConverterImGui.Graphics;
-using AcSaveConverterImGui.GUI.Dialogs.Popups.ACFA;
-using AcSaveConverterImGui.GUI.Dialogs.Tabs;
-using AcSaveConverterImGui.IO;
-using AcSaveConverterImGui.IO.Assets;
+using AcSaveConverter.Graphics;
+using AcSaveConverter.GUI.Dialogs.Popups.ACFA;
+using AcSaveConverter.GUI.Dialogs.Tabs;
+using AcSaveConverter.IO;
+using AcSaveConverter.IO.Assets;
 using AcSaveFormats.ACFA;
 using AcSaveFormats.ACFA.Designs;
 using ImGuiNET;
@@ -11,7 +11,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
-namespace AcSaveConverterImGui.GUI.Dialogs.ACFA
+namespace AcSaveConverter.GUI.Dialogs.ACFA
 {
     internal class DesignFaDialog : IDataTab
     {

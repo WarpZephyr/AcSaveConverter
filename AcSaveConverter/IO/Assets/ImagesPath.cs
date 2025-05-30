@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace AcSaveConverterImGui.IO.Assets
+namespace AcSaveConverter.IO.Assets
 {
     internal static class ImagesPath
     {

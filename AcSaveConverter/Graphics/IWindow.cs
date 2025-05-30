@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace AcSaveConverterImGui.Graphics
+namespace AcSaveConverter.Graphics
 {
     public interface IWindow
     {

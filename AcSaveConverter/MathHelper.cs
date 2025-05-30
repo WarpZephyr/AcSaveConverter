@@ -1,4 +1,4 @@
-﻿namespace AcSaveConverterImGui
+﻿namespace AcSaveConverter
 {
     internal static class MathHelper
     {

@@ -1,10 +1,10 @@
-﻿using AcSaveConverterImGui.Graphics;
-using AcSaveConverterImGui.GUI.Dialogs.Tabs;
+﻿using AcSaveConverter.Graphics;
+using AcSaveConverter.GUI.Dialogs.Tabs;
 using ImGuiNET;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace AcSaveConverterImGui.GUI.Dialogs.Popups
+namespace AcSaveConverter.GUI.Dialogs.Popups
 {
     public class NewTabPopup : IPopup
     {
