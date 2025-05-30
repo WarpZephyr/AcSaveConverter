@@ -544,31 +544,37 @@ namespace AcSaveConverter.GUI.Dialogs.Tabs
 
             bool jp = region == RegionType.JP;
             bool xbox = platform == PlatformType.Xbox360;
-            switch (CurrentExportKind)
-            {
-                case ExportKind.GameData:
-                    if (xbox)
-                    {
-                        Log.WriteLine($"Exporting {region} Xbox 360 game data save to folder: {folder}");
-                        Export_GameData_Xbox360(folder);
-                    }
-                    else
-                    {
-                        Log.WriteLine($"Exporting {region} PS3 game data save to folder: {folder}");
-                        Export_GameData_PS3(folder, jp);
-                    }
-                    break;
-                case ExportKind.DesignDocument:
-                    Log.WriteLine($"Exporting {region} {(xbox ? "Xbox 360" : "PS3")} design document save to folder: {folder}");
-                    Export_DesignDocument(folder, xbox, jp);
-                    break;
-                case ExportKind.Paint:
-                    Log.WriteLine($"Exporting {region} {(xbox ? "Xbox 360" : "PS3")} paint save to folder: {folder}");
-                    Export_Paint(folder, xbox, jp);
-                    break;
-            }
 
-            Log.WriteLine("Finished export.");
+            try
+            {
+                switch (CurrentExportKind)
+                {
+                    case ExportKind.GameData:
+                        if (xbox)
+                        {
+                            Log.WriteLine($"Exporting {region} Xbox 360 game data save to folder: {folder}");
+                            Export_GameData_Xbox360(folder);
+                        }
+                        else
+                        {
+                            Log.WriteLine($"Exporting {region} PS3 game data save to folder: {folder}");
+                            Export_GameData_PS3(folder, jp);
+                        }
+                        break;
+                    case ExportKind.DesignDocument:
+                        Log.WriteLine($"Exporting {region} {(xbox ? "Xbox 360" : "PS3")} design document save to folder: {folder}");
+                        Export_DesignDocument(folder, xbox, jp);
+                        break;
+                    case ExportKind.Paint:
+                        Log.WriteLine($"Exporting {region} {(xbox ? "Xbox 360" : "PS3")} paint save to folder: {folder}");
+                        Export_Paint(folder, xbox, jp);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine($"Export failed: {ex}");
+            }
         }
 
         #endregion
