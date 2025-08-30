@@ -1,9 +1,9 @@
 ﻿using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using System.Reflection;
-using System.IO;
 
 namespace Veldrid
 {
@@ -74,13 +74,18 @@ namespace Veldrid
             IntPtr context = ImGui.CreateContext();
             ImGui.SetCurrentContext(context);
 
+            ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+
             ImGui.GetIO().Fonts.AddFontDefault();
             ImGui.GetIO().Fonts.Flags |= ImFontAtlasFlags.NoBakedLines;
 
             CreateDeviceResources(gd, outputDescription);
 
             SetPerFrameImGuiData(1f / 60f);
+        }
 
+        public void Begin()
+        {
             ImGui.NewFrame();
             _frameBegun = true;
         }
@@ -262,33 +267,33 @@ namespace Veldrid
             switch (factory.BackendType)
             {
                 case GraphicsBackend.Direct3D11:
-                {
-                    if (stage == ShaderStages.Vertex && colorSpaceHandling == ColorSpaceHandling.Legacy) { name += "-legacy"; }
-                    string resourceName = name + ".hlsl.bytes";
-                    return GetEmbeddedResourceBytes(resourceName);
-                }
+                    {
+                        if (stage == ShaderStages.Vertex && colorSpaceHandling == ColorSpaceHandling.Legacy) { name += "-legacy"; }
+                        string resourceName = name + ".hlsl.bytes";
+                        return GetEmbeddedResourceBytes(resourceName);
+                    }
                 case GraphicsBackend.OpenGL:
-                {
-                    if (stage == ShaderStages.Vertex && colorSpaceHandling == ColorSpaceHandling.Legacy) { name += "-legacy"; }
-                    string resourceName = name + ".glsl";
-                    return GetEmbeddedResourceBytes(resourceName);
-                }
+                    {
+                        if (stage == ShaderStages.Vertex && colorSpaceHandling == ColorSpaceHandling.Legacy) { name += "-legacy"; }
+                        string resourceName = name + ".glsl";
+                        return GetEmbeddedResourceBytes(resourceName);
+                    }
                 case GraphicsBackend.OpenGLES:
-                {
-                    if (stage == ShaderStages.Vertex && colorSpaceHandling == ColorSpaceHandling.Legacy) { name += "-legacy"; }
-                    string resourceName = name + ".glsles";
-                    return GetEmbeddedResourceBytes(resourceName);
-                }
+                    {
+                        if (stage == ShaderStages.Vertex && colorSpaceHandling == ColorSpaceHandling.Legacy) { name += "-legacy"; }
+                        string resourceName = name + ".glsles";
+                        return GetEmbeddedResourceBytes(resourceName);
+                    }
                 case GraphicsBackend.Vulkan:
-                {
-                    string resourceName = name + ".spv";
-                    return GetEmbeddedResourceBytes(resourceName);
-                }
+                    {
+                        string resourceName = name + ".spv";
+                        return GetEmbeddedResourceBytes(resourceName);
+                    }
                 case GraphicsBackend.Metal:
-                {
-                    string resourceName = name + ".metallib";
-                    return GetEmbeddedResourceBytes(resourceName);
-                }
+                    {
+                        string resourceName = name + ".metallib";
+                        return GetEmbeddedResourceBytes(resourceName);
+                    }
                 default:
                     throw new NotImplementedException();
             }

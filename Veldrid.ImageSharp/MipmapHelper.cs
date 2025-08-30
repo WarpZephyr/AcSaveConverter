@@ -1,7 +1,7 @@
-﻿using System;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System;
 using System.Diagnostics;
 
 namespace Veldrid.ImageSharp

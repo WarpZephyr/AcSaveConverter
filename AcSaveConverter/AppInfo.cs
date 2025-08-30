@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace AcSaveConverter
 {
-    internal class AppInfo
+    internal static class AppInfo
     {
-        public readonly string Platform;
-        public readonly string Version;
+        public static readonly string Platform;
+        public static readonly string Version;
 #if DEBUG
         public const bool IsDebug = true;
 #else
         public const bool IsDebug = false;
 #endif
-        public const string AppName = Program.AppName;
-        public readonly string AppFilePath;
-        public readonly string AppDirectory;
+        public const string AppName = "AcSaveConverter";
+        public static readonly string AppFilePath;
+        public static readonly string AppDirectory;
 
-        public AppInfo()
+        static AppInfo()
         {
             Platform = GetPlatform();
             Version = GetVersion();

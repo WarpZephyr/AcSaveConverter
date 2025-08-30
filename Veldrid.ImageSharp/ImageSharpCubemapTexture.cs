@@ -1,13 +1,9 @@
 ﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Advanced;
-using SixLabors.ImageSharp.ColorSpaces;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Buffers;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using Vortice.DXGI;
 
 namespace Veldrid.ImageSharp
 {
@@ -65,9 +61,10 @@ namespace Veldrid.ImageSharp
                 Image.Load<TPixel>(negativeXPath),
                 Image.Load<TPixel>(positiveYPath),
                 Image.Load<TPixel>(negativeYPath),
-                Image.Load<TPixel>(positiveZPath), 
+                Image.Load<TPixel>(positiveZPath),
                 Image.Load<TPixel>(negativeZPath),
-                true) { }
+                true)
+        { }
 
         public ImageSharpCubemapTexture(
             string positiveXPath,
@@ -199,7 +196,7 @@ namespace Veldrid.ImageSharp
                 }
                 if (!CubemapTextures[PositiveZArrayLayer][level].DangerousTryGetSinglePixelMemory(out Memory<TPixel> pixelMemoryPosZ))
                 {
-                    throw new VeldridException("Unable to get positive z pixelmemory."); 
+                    throw new VeldridException("Unable to get positive z pixelmemory.");
                 }
                 if (!CubemapTextures[NegativeZArrayLayer][level].DangerousTryGetSinglePixelMemory(out Memory<TPixel> pixelMemoryNegZ))
                 {
