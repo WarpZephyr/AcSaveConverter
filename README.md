@@ -12,11 +12,12 @@ A program for opening and exporting Armored Core saves between platforms and reg
 # Building
 This project requires the following libraries to be cloned alongside it.  
 Place them in the same top-level folder as this project.  
+These dependencies may change at any time.  
 ```
 git clone https://github.com/WarpZephyr/AcSaveFormats.git  
-git clone https://github.com/WarpZephyr/BinaryMemory.git  
+git clone https://github.com/WarpZephyr/Edoke.git  
 ```
 
 # Credits
 Massive thanks to [DrSwizzler](https://github.com/Shadowth117/DrSwizzler) for support loading Xbox 360 texture files.  
-Massive thanks to [Smithbox](https://github.com/vawser/Smithbox) for font handling to display japanese characters.
+Massive thanks to [Smithbox](https://github.com/vawser/Smithbox) for font handling to display japanese characters and ImGui guidance.
