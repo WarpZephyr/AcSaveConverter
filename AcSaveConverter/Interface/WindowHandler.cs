@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using System.Diagnostics;
 
 namespace AcSaveConverter.Interface
 {
@@ -22,23 +23,11 @@ namespace AcSaveConverter.Interface
 
         public void OnGui()
         {
-            if (ShowImGuiDemoWindow)
-                ImGui.ShowDemoWindow(ref ShowImGuiDemoWindow);
-
-            if (ShowImGuiMetricsWindow)
-                ImGui.ShowMetricsWindow(ref ShowImGuiMetricsWindow);
-
-            if (ShowImGuiDebugLogWindow)
-                ImGui.ShowDebugLogWindow(ref ShowImGuiDebugLogWindow);
-
-            if (ShowImGuiStackToolWindow)
-                ImGui.ShowIDStackToolWindow(ref ShowImGuiStackToolWindow);
-
-            if (ShowImGuiAboutWindow)
-                ImGui.ShowAboutWindow(ref ShowImGuiAboutWindow);
+            ShowDebugWindows();
         }
 
-        public void DebugDropdown()
+        [Conditional("DEBUG")]
+        private void DebugDropdown()
         {
             if (ImGui.BeginMenu("Debug"))
             {
@@ -68,6 +57,25 @@ namespace AcSaveConverter.Interface
                 }
                 ImGui.EndMenu();
             }
+        }
+
+        [Conditional("DEBUG")]
+        private void ShowDebugWindows()
+        {
+            if (ShowImGuiDemoWindow)
+                ImGui.ShowDemoWindow(ref ShowImGuiDemoWindow);
+
+            if (ShowImGuiMetricsWindow)
+                ImGui.ShowMetricsWindow(ref ShowImGuiMetricsWindow);
+
+            if (ShowImGuiDebugLogWindow)
+                ImGui.ShowDebugLogWindow(ref ShowImGuiDebugLogWindow);
+
+            if (ShowImGuiStackToolWindow)
+                ImGui.ShowIDStackToolWindow(ref ShowImGuiStackToolWindow);
+
+            if (ShowImGuiAboutWindow)
+                ImGui.ShowAboutWindow(ref ShowImGuiAboutWindow);
         }
     }
 }
