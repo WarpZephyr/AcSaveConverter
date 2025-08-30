@@ -1,4 +1,5 @@
 ﻿using AcSaveConverter.Fonts;
+using AcSaveConverter.Input;
 using AcSaveConverter.Interface;
 using AcSaveConverter.Logging;
 using AcSaveConverter.Resources;
@@ -68,6 +69,8 @@ namespace AcSaveConverter.Graphics
                 AppConfig.Current.WindowWidth = sdl2Window.Width;
                 AppConfig.Current.WindowHeight = sdl2Window.Height;
             };
+
+            sdl2Window.DragDrop += InputTracker.HandleDragDrop;
         }
 
         public GraphicsContext(Point location, Size size, string title) : this(location.X, location.Y, size.Width, size.Height, title) { }
@@ -76,6 +79,7 @@ namespace AcSaveConverter.Graphics
         {
             var input = Window.PumpEvents();
             DPI.Current.UpdateDPI(GetDisplayDPI());
+            InputTracker.UpdateFrameInput(input, Window);
             GuiRenderer.Update(deltaTime, input);
         }
 

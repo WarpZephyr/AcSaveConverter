@@ -3,6 +3,7 @@ using AcSaveConverter.Editors.AcfaEditor.Data;
 using AcSaveConverter.Editors.AcfaEditor.Popups;
 using AcSaveConverter.Editors.AcfaEditor.Views;
 using AcSaveConverter.Graphics;
+using AcSaveConverter.Input;
 using AcSaveConverter.Interface;
 using AcSaveConverter.Logging;
 using AcSaveConverter.Resources;
@@ -48,7 +49,18 @@ namespace AcSaveConverter.Editors.AcfaEditor
 
         public void Update(float deltaTime)
         {
-
+            if (InputTracker.HasDragDrop())
+            {
+                string path = InputTracker.GetDragDrop();
+                if (Directory.Exists(path))
+                {
+                    LoadFolder(path);
+                }
+                else if (File.Exists(path))
+                {
+                    LoadFile(path);
+                }
+            }
         }
 
         #region IO
@@ -115,6 +127,14 @@ namespace AcSaveConverter.Editors.AcfaEditor
             }
         }
 
+        private void LoadFolder(string folder)
+        {
+            foreach (string file in Directory.EnumerateFiles(folder, "*", SearchOption.TopDirectoryOnly))
+            {
+                LoadFile(file);
+            }
+        }
+
         private void OpenFiles()
         {
             string[] paths = FileDialog.OpenFiles();
@@ -132,10 +152,7 @@ namespace AcSaveConverter.Editors.AcfaEditor
                 return;
             }
 
-            foreach (string file in Directory.EnumerateFiles(folder, "*", SearchOption.TopDirectoryOnly))
-            {
-                LoadFile(file);
-            }
+            LoadFolder(folder);
         }
 
         #endregion
