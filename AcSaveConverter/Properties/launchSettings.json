@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "AcSaveConverter": {
-      "commandName": "Project",
-      "nativeDebugging": false
-    }
-  }
-}
