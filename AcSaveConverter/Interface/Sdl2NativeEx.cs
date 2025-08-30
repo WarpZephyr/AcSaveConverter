@@ -28,18 +28,12 @@ namespace AcSaveConverter.Interface
                 name = "SDL2";
             }
 
-            NativeLibrary lib = new NativeLibrary(name);
-            return lib;
-        }
-
-        private static T LoadFunction<T>(string name)
-        {
-            return s_sdl2Lib.LoadFunction<T>(name);
+            return new NativeLibrary(name);
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int SDL_GetDisplayDPI_t(int displayIndex, float* ddpi, float* hdpi, float* vdpi);
-        private static readonly SDL_GetDisplayDPI_t s_sdl_getWindowDisplayDPI = LoadFunction<SDL_GetDisplayDPI_t>("SDL_GetDisplayDPI");
+        private static readonly SDL_GetDisplayDPI_t s_sdl_getWindowDisplayDPI = s_sdl2Lib.LoadFunction<SDL_GetDisplayDPI_t>("SDL_GetDisplayDPI");
         public static int SDL_GetDisplayDPI(int displayIndex, float* ddpi, float* hdpi, float* vdpi) => s_sdl_getWindowDisplayDPI(displayIndex, ddpi, hdpi, vdpi);
     }
 }
