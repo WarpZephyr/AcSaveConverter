@@ -1,6 +1,6 @@
 ﻿using AcSaveConverter.Editors;
 using AcSaveConverter.Editors.AcfaEditor;
-using AcSaveConverter.Graphics;
+using AcSaveConverter.Resources;
 using System;
 using System.Collections.Generic;
 
@@ -14,9 +14,9 @@ namespace AcSaveConverter.Interface
         public AcfaEditorScreen AcfaEditor;
         private bool disposedValue;
 
-        public EditorHandler(GuiTexturePool texturePool)
+        public EditorHandler(ResourceHandler resourceHandler)
         {
-            AcfaEditor = new AcfaEditorScreen(texturePool);
+            AcfaEditor = new AcfaEditorScreen(resourceHandler);
             FocusedEditor = AcfaEditor;
 
             Editors =

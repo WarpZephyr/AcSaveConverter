@@ -1105,6 +1105,10 @@ namespace AcSaveConverter.Interface
             ImGui.Text(fmt);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DrawOver(nint user_texture_id, Vector2 location, Vector2 size)
+            => ImGui.GetWindowDrawList().AddImage(user_texture_id, location, location + size);
+
         public static void PushStyleHideButtonBg()
         {
             ImGui.PushStyleColor(ImGuiCol.Button, ImGui.GetColorU32(ImGuiCol.WindowBg));

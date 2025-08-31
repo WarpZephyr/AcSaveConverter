@@ -3,10 +3,10 @@ using AcSaveConverter.Editors.AcfaEditor.Data;
 using AcSaveConverter.Editors.AcfaEditor.Popups;
 using AcSaveConverter.Editors.AcfaEditor.Utilities;
 using AcSaveConverter.Editors.AcfaEditor.Views;
-using AcSaveConverter.Graphics;
 using AcSaveConverter.Input;
 using AcSaveConverter.Interface;
 using AcSaveConverter.Logging;
+using AcSaveConverter.Resources;
 using AcSaveFormats.ArmoredCoreForAnswer;
 using AcSaveFormats.ArmoredCoreForAnswer.Xbox360;
 using ImGuiNET;
@@ -31,18 +31,18 @@ namespace AcSaveConverter.Editors.AcfaEditor
         private readonly AcColorSetPopup ColorPopup;
         private bool disposedValue;
 
-        public AcfaEditorScreen(GuiTexturePool texturePool)
+        public AcfaEditorScreen(ResourceHandler resourceHandler)
         {
             ExportPopup = new ExportPopup();
             ExportPopup.ExportPressed += ExportPressed;
 
             ColorPopup = new AcColorSetPopup();
 
-            DesignView = new DesignView(texturePool, ColorPopup);
+            DesignView = new DesignView(resourceHandler, ColorPopup);
             GameProgressView = new GameProgressView();
             OptionsSettingsView = new OptionsSettingsView();
             PlayerDataView = new PlayerDataView();
-            DesignDocumentView = new DesignDocumentView(texturePool, ColorPopup);
+            DesignDocumentView = new DesignDocumentView(resourceHandler, ColorPopup);
             PaintView = new PaintView();
         }
 

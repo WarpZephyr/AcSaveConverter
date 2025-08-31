@@ -18,16 +18,16 @@ namespace AcSaveConverter.Editors.AcfaEditor.Views
 {
     public class DesignView : IDisposable
     {
-        private readonly GuiTexturePool TexturePool;
+        private readonly ResourceHandler ResourceHandler;
         private readonly AcColorSetPopup ColorPopup;
 
         private Design Data;
         private TextureHandle ThumbnailCache;
         private bool disposedValue;
 
-        public DesignView(GuiTexturePool texturePool, AcColorSetPopup colorPopup)
+        public DesignView(ResourceHandler resourceHandler, AcColorSetPopup colorPopup)
         {
-            TexturePool = texturePool;
+            ResourceHandler = resourceHandler;
             ColorPopup = colorPopup;
             Data = new Design()
             {
@@ -36,7 +36,7 @@ namespace AcSaveConverter.Editors.AcfaEditor.Views
                 Thumbnail = GetDefaultThumbnail()
             };
 
-            ThumbnailCache = TexturePool.LoadDDS(Data.Thumbnail.GetDdsBytes());
+            ThumbnailCache = ResourceHandler.LoadDDS(Data.Thumbnail.GetDdsBytes());
         }
 
         public void Display()
@@ -44,7 +44,7 @@ namespace AcSaveConverter.Editors.AcfaEditor.Views
             EditorDecorator.SetupWindow();
             if (ImGui.Begin("Design"))
             {
-                DisplayDesign("CurrentDesign", Data, ThumbnailCache, ColorPopup, out bool thumbnailUpdate);
+                DisplayDesign("CurrentDesign", Data, ThumbnailCache, ResourceHandler.GetDefaultThumbnail(), ColorPopup, out bool thumbnailUpdate);
                 if (thumbnailUpdate)
                 {
                     ReloadThumbnail();
@@ -56,11 +56,13 @@ namespace AcSaveConverter.Editors.AcfaEditor.Views
 
         #region Inner Gui
 
-        internal static void DisplayDesign(string id, Design data, TextureHandle thumbnailCache, AcColorSetPopup colorPopup, out bool thumbnailUpdate)
+        internal static void DisplayDesign(string id, Design data, TextureHandle thumbnail, TextureHandle defaultThumbnail, AcColorSetPopup colorPopup, out bool thumbnailUpdate)
         {
             thumbnailUpdate = false;
 
-            ImGui.Image(thumbnailCache.GetHandle(), thumbnailCache.Size);
+            var pos = ImGui.GetCursorScreenPos();
+            ImGui.Image(defaultThumbnail.GetHandle(), defaultThumbnail.Size);
+            ImGuiEx.DrawOver(thumbnail.GetHandle(), pos, defaultThumbnail.Size);
             ImGui.PushID(id);
             if (ImGui.BeginPopupContextItem("ThumbnailContextMenu"))
             {
@@ -357,7 +359,7 @@ namespace AcSaveConverter.Editors.AcfaEditor.Views
         private void ReloadThumbnail()
         {
             DestroyThumbnail();
-            ThumbnailCache = TexturePool.LoadDDS(Data.Thumbnail.GetDdsBytes());
+            ThumbnailCache = ResourceHandler.LoadDDS(Data.Thumbnail.GetDdsBytes());
         }
 
         private static Thumbnail GetDefaultThumbnail()

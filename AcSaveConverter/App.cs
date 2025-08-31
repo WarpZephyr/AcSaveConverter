@@ -1,5 +1,6 @@
 ﻿using AcSaveConverter.Graphics;
 using AcSaveConverter.Interface;
+using AcSaveConverter.Resources;
 using ImGuiNET;
 using System;
 using System.Diagnostics;
@@ -10,6 +11,7 @@ namespace AcSaveConverter
     public class App : IDisposable
     {
         private readonly GraphicsContext Graphics;
+        private readonly ResourceHandler ResourceHandler;
         private readonly EditorHandler EditorHandler;
         private readonly WindowHandler WindowHandler;
         private int FrameCount;
@@ -22,7 +24,8 @@ namespace AcSaveConverter
             int width = AppConfig.Current.WindowWidth;
             int height = AppConfig.Current.WindowHeight;
             Graphics = new GraphicsContext(x, y, width, height, AppInfo.AppName);
-            EditorHandler = new EditorHandler(Graphics.TexturePool);
+            ResourceHandler = new ResourceHandler(Graphics.TexturePool);
+            EditorHandler = new EditorHandler(ResourceHandler);
             WindowHandler = new WindowHandler();
         }
 
@@ -125,6 +128,7 @@ namespace AcSaveConverter
                 if (disposing)
                 {
                     EditorHandler.Dispose();
+                    ResourceHandler.Dispose();
                     Graphics.Dispose();
                 }
 

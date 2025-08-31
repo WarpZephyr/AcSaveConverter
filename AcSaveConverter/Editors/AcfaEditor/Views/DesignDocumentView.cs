@@ -3,6 +3,7 @@ using AcSaveConverter.Editors.AcfaEditor.Utilities;
 using AcSaveConverter.Editors.Framework;
 using AcSaveConverter.Graphics;
 using AcSaveConverter.Logging;
+using AcSaveConverter.Resources;
 using AcSaveFormats.ArmoredCoreForAnswer;
 using AcSaveFormats.ArmoredCoreForAnswer.Designs;
 using ImGuiNET;
@@ -14,15 +15,15 @@ namespace AcSaveConverter.Editors.AcfaEditor.Views
 {
     public class DesignDocumentView : IDisposable
     {
-        private readonly GuiTexturePool TexturePool;
+        private readonly ResourceHandler ResourceHandler;
         private readonly AcColorSetPopup ColorPopup;
         private readonly List<TextureHandle> ThumbnailsCache;
         private DesignDocument Data;
         private bool disposedValue;
 
-        public DesignDocumentView(GuiTexturePool texturePool, AcColorSetPopup colorPopup)
+        public DesignDocumentView(ResourceHandler resourceHandler, AcColorSetPopup colorPopup)
         {
-            TexturePool = texturePool;
+            ResourceHandler = resourceHandler;
             ColorPopup = colorPopup;
             ThumbnailsCache = [];
 
@@ -44,7 +45,7 @@ namespace AcSaveConverter.Editors.AcfaEditor.Views
                 {
                     var design = Data.Designs[i];
                     var thumbnailCache = ThumbnailsCache[i];
-                    DesignView.DisplayDesign($"Design[{i}]", design, thumbnailCache, ColorPopup, out bool thumbnailUpdate);
+                    DesignView.DisplayDesign($"Design[{i}]", design, thumbnailCache, ResourceHandler.GetDefaultThumbnail(), ColorPopup, out bool thumbnailUpdate);
                     if (thumbnailUpdate)
                     {
                         ReloadThumbnail(i);
@@ -200,12 +201,12 @@ namespace AcSaveConverter.Editors.AcfaEditor.Views
         private void ReloadThumbnail(int index)
         {
             ThumbnailsCache[index].Dispose();
-            ThumbnailsCache[index] = TexturePool.LoadDDS(Data.Designs[index].Thumbnail.GetDdsBytes());
+            ThumbnailsCache[index] = ResourceHandler.LoadDDS(Data.Designs[index].Thumbnail.GetDdsBytes());
         }
 
         private void LoadThumbnail(Thumbnail thumbnail)
         {
-            ThumbnailsCache.Add(TexturePool.LoadDDS(thumbnail.GetDdsBytes()));
+            ThumbnailsCache.Add(ResourceHandler.LoadDDS(thumbnail.GetDdsBytes()));
         }
 
         #endregion
