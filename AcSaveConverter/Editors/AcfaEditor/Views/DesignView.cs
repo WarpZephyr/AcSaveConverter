@@ -60,6 +60,8 @@ namespace AcSaveConverter.Editors.AcfaEditor.Views
         {
             thumbnailUpdate = false;
 
+            // The game shows a background for images with alpha
+            // Draw that first, then draw the thumbnail over it
             var pos = ImGui.GetCursorScreenPos();
             ImGui.Image(defaultThumbnail.GetHandle(), defaultThumbnail.Size);
             ImGuiEx.DrawOver(thumbnail.GetHandle(), pos, defaultThumbnail.Size);
