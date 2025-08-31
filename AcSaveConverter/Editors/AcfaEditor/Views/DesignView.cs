@@ -180,7 +180,7 @@ namespace AcSaveConverter.Editors.AcfaEditor.Views
                 }
             }
             ImGuiEx.PopStyleHideButtonBg();
-            ImGuiEx.ShowHoverTooltip("Whether or not this design is locked to prevent editing (Depreciated).");
+            ImGuiEx.ShowHoverTooltip("Lock this design to prevent editing (Depreciated).");
 
             ImGui.AlignTextToFramePadding();
             if (ImGui.Button("Edit"))
