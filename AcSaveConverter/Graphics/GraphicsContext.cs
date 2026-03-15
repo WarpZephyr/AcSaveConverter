@@ -143,10 +143,13 @@ namespace AcSaveConverter.Graphics
             // English fonts
             {
                 ImFontConfig* ptr = ImGuiNative.ImFontConfig_ImFontConfig();
-                ImFontConfigPtr cfg = new(ptr);
-                cfg.GlyphMinAdvanceX = 5.0f;
-                cfg.OversampleH = 5;
-                cfg.OversampleV = 5;
+                ImFontConfigPtr cfg = new(ptr)
+                {
+                    GlyphMinAdvanceX = 5.0f,
+                    OversampleH = 5,
+                    OversampleV = 5
+                };
+
                 fonts.AddFontFromMemoryTTF(fontEnNative, fontIcon.Length, scaleFine, cfg,
                     fonts.GetGlyphRangesDefault());
             }

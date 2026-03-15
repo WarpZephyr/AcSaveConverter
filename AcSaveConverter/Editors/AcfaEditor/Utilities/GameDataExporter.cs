@@ -14,11 +14,11 @@ namespace AcSaveConverter.Editors.AcfaEditor.Utilities
         {
             if (xbox)
             {
-                ExportPs3(folder, gameData, jp);
+                ExportXbox360(folder, gameData);
             }
             else
             {
-                ExportXbox360(folder, gameData);
+                ExportPs3(folder, gameData, jp);
             }
         }
 

@@ -8,18 +8,18 @@ namespace AcSaveConverter.Resources
     public class ResourceHandler : IDisposable
     {
         private readonly GuiTexturePool TexturePool;
-        private readonly TextureHandle DefaultThumbnailCache;
+        private readonly TextureHandle DefaultThumbnail;
         private bool disposedValue;
 
         public ResourceHandler(GuiTexturePool texturePool)
         {
             TexturePool = texturePool;
-            DefaultThumbnailCache = TexturePool.LoadDDS(AssetPath.GetImagePath(Path.Combine("ArmoredCoreForAnswer", "background.dds")));
+            DefaultThumbnail = TexturePool.LoadDDS(AssetPath.GetImagePath(Path.Combine("ArmoredCoreForAnswer", "background.dds")));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TextureHandle GetDefaultThumbnail()
-            => DefaultThumbnailCache;
+            => DefaultThumbnail;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TextureHandle LoadDDS(byte[] bytes)
@@ -37,7 +37,7 @@ namespace AcSaveConverter.Resources
             {
                 if (disposing)
                 {
-                    DefaultThumbnailCache.Dispose();
+                    DefaultThumbnail.Dispose();
                 }
 
                 disposedValue = true;
